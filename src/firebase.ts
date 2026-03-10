@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getAuth, setPersistence, browserSessionPersistence } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -16,4 +16,10 @@ if (!firebaseConfig.apiKey) {
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
+
+// Session only - clears when browser tab is closed
+setPersistence(auth, browserSessionPersistence).catch((error) => {
+  console.error('Failed to set auth persistence:', error);
+});
+
 export default app;
