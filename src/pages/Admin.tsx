@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import {
     getPendingClaims, approveClaim, rejectClaim, reopenClaim,
     addClaimNote, getClaimEvidence, requestProof, getAnalytics,
-    seedCctvLogs, approveSale, Claim
+    seedCctvLogs, approveSale, getReturnedItems, Claim, Item
 } from '../api/services';
 import {
-    Check, X, Calendar, MessageCircle, Video, Sparkles,
+    Check, X, Calendar, MessageCircle, Sparkles,
     Database, Loader2, RotateCcw, StickyNote, FileSearch,
     ShieldAlert, BarChart3, DollarSign, TrendingUp, Clock, Package
 } from 'lucide-react';
@@ -35,10 +35,27 @@ const Admin: React.FC = () => {
     const [evidenceClaimId, setEvidenceClaimId] = useState<string | null>(null);
     const [evidenceLoading, setEvidenceLoading] = useState(false);
 
+    const [activeTab, setActiveTab] = useState<'claims' | 'returned'>('claims');
+    const [returnedItems, setReturnedItems] = useState<Item[]>([]);
+    const [returnedLoading, setReturnedLoading] = useState(false);
+
     useEffect(() => {
         fetchPendingClaims();
         fetchAnalytics();
+        fetchReturnedItems();
     }, []);
+
+    const fetchReturnedItems = async () => {
+        setReturnedLoading(true);
+        try {
+            const response = await getReturnedItems();
+            setReturnedItems(response.data || []);
+        } catch (error) {
+            console.error('Failed to fetch returned items:', error);
+        } finally {
+            setReturnedLoading(false);
+        }
+    };
 
     const fetchPendingClaims = async () => {
         setLoading(true);
@@ -272,144 +289,236 @@ const Admin: React.FC = () => {
                     </div>
                 )}
 
-                {/* ═══ Pending Claims ═══ */}
-                {loading ? (
-                    <div className="space-y-4">
-                        {[...Array(3)].map((_, i) => <div key={i} className="skeleton h-40" />)}
-                    </div>
-                ) : claims.length === 0 ? (
-                    <div className="card p-16 text-center" style={{ transform: 'none' }}>
-                        <div className="w-16 h-16 rounded-2xl bg-surface-200 flex items-center justify-center mx-auto mb-4">
-                            <TrendingUp className="w-8 h-8 text-zinc-600" />
+                {/* ═══ Tabs ═══ */}
+                <div className="flex gap-4 border-b border-white/[0.06] mb-6">
+                    <button
+                        onClick={() => setActiveTab('claims')}
+                        className={`pb-3 text-sm font-medium transition-colors relative ${activeTab === 'claims' ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
+                    >
+                        Pending Claims
+                        {activeTab === 'claims' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent rounded-t-full" />}
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('returned')}
+                        className={`pb-3 text-sm font-medium transition-colors relative ${activeTab === 'returned' ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
+                    >
+                        Returned Items ({returnedItems.length})
+                        {activeTab === 'returned' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent rounded-t-full" />}
+                    </button>
+                </div>
+
+                {/* ═══ Pending Claims List ═══ */}
+                {activeTab === 'claims' && (
+                    loading ? (
+                        <div className="space-y-4">
+                            {[...Array(3)].map((_, i) => <div key={i} className="skeleton h-40" />)}
                         </div>
-                        <h3 className="text-lg font-semibold text-zinc-300 mb-2">All Clear!</h3>
-                        <p className="text-zinc-500 text-sm">No pending claims to review</p>
-                    </div>
-                ) : (
-                    <div className="space-y-4">
-                        {claims.map((claim, idx) => (
-                            <div
-                                key={claim.id}
-                                className="card p-5 animate-fade-in"
-                                style={{ animationDelay: `${idx * 60}ms` }}
-                            >
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className="flex-1 min-w-0 flex gap-4">
-                                        {/* Thumbnail */}
-                                        <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-surface-200 border border-white/[0.04] flex items-center justify-center">
-                                            {claim.item?.imageUrl ? (
-                                                <img 
-                                                    src={claim.item.imageUrl.startsWith('http') ? claim.item.imageUrl : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${claim.item.imageUrl}`} 
-                                                    alt={claim.item?.title || 'Item'} 
-                                                    className="w-full h-full object-cover"
-                                                />
-                                            ) : (
-                                                <Package className="w-6 h-6 text-zinc-600" />
-                                            )}
-                                        </div>
-                                        
-                                        {/* Info */}
+                    ) : claims.length === 0 ? (
+                        <div className="card p-16 text-center" style={{ transform: 'none' }}>
+                            <div className="w-16 h-16 rounded-2xl bg-surface-200 flex items-center justify-center mx-auto mb-4">
+                                <TrendingUp className="w-8 h-8 text-zinc-600" />
+                            </div>
+                            <h3 className="text-lg font-semibold text-zinc-300 mb-2">All Clear!</h3>
+                            <p className="text-zinc-500 text-sm">No pending claims to review</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {claims.map((claim, idx) => (
+                                <div
+                                    key={claim.id}
+                                    className="card p-5 animate-fade-in"
+                                    style={{ animationDelay: `${idx * 60}ms` }}
+                                >
+                                    <div className="flex justify-between items-start mb-4">
                                         <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-3 mb-2">
-                                                <h3 className="text-base font-semibold text-white truncate">
-                                                    {claim.item?.title || 'Item'}
-                                                </h3>
-                                                <span className={`badge ${claim.item?.type === 'lost' ? 'badge-lost' : 'badge-found'}`}>
-                                                    {claim.item?.type}
-                                                </span>
+                                            {/* Both items side-by-side */}
+                                            <div className="flex gap-3 mb-3">
+                                                {/* Found item thumbnail */}
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-[10px] text-emerald-400 uppercase tracking-widest mb-1.5 font-semibold">Found Item</p>
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-surface-200 border border-white/[0.04] flex items-center justify-center">
+                                                            {claim.item?.imageUrl ? (
+                                                                <img
+                                                                    src={claim.item.imageUrl.startsWith('http') ? claim.item.imageUrl : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${claim.item.imageUrl}`}
+                                                                    alt={claim.item?.title || 'Item'}
+                                                                    className="w-full h-full object-cover"
+                                                                />
+                                                            ) : (
+                                                                <Package className="w-5 h-5 text-zinc-600" />
+                                                            )}
+                                                        </div>
+                                                        <div className="min-w-0">
+                                                            <p className="text-sm font-medium text-white truncate">{claim.item?.title || 'Item'}</p>
+                                                            <p className="text-[11px] text-zinc-600 truncate">{(claim.item as any)?.location || ''}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Lost item thumbnail */}
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-[10px] text-red-400 uppercase tracking-widest mb-1.5 font-semibold">Lost Item</p>
+                                                    {(claim as any).lostItem ? (
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-surface-200 border border-white/[0.04] flex items-center justify-center">
+                                                                {(claim as any).lostItem?.imageUrl ? (
+                                                                    <img
+                                                                        src={(claim as any).lostItem.imageUrl.startsWith('http') ? (claim as any).lostItem.imageUrl : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${(claim as any).lostItem.imageUrl}`}
+                                                                        alt={(claim as any).lostItem?.title || 'Item'}
+                                                                        className="w-full h-full object-cover"
+                                                                    />
+                                                                ) : (
+                                                                    <Package className="w-5 h-5 text-zinc-600" />
+                                                                )}
+                                                            </div>
+                                                            <div className="min-w-0">
+                                                                <p className="text-sm font-medium text-white truncate">{(claim as any).lostItem?.title || 'Item'}</p>
+                                                                <p className="text-[11px] text-zinc-600 truncate">{(claim as any).lostItem?.location || ''}</p>
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <p className="text-xs text-zinc-600 italic">No linked lost item</p>
+                                                    )}
+                                                </div>
                                             </div>
-                                        {claim.item?.description && (
-                                            <p className="text-sm text-zinc-500 line-clamp-2 leading-relaxed mb-3">
-                                                {claim.item.description}
-                                            </p>
-                                        )}
-                                        <div className="flex items-center gap-1.5 text-xs text-zinc-600">
-                                            <Calendar className="w-3.5 h-3.5" />
-                                            <span>{
-                                                claim.createdAt
-                                                    ? (typeof claim.createdAt === 'object' && '_seconds' in (claim.createdAt as any))
-                                                        ? new Date((claim.createdAt as any)._seconds * 1000).toLocaleDateString()
-                                                        : new Date(claim.createdAt).toLocaleDateString()
-                                                    : 'N/A'
-                                            }</span>
+
+                                            {claim.item?.description && (
+                                                <p className="text-sm text-zinc-500 line-clamp-2 leading-relaxed mb-3">
+                                                    {claim.item.description}
+                                                </p>
+                                            )}
+                                            <div className="flex items-center gap-1.5 text-xs text-zinc-600">
+                                                <Calendar className="w-3.5 h-3.5" />
+                                                <span>{
+                                                    claim.createdAt
+                                                        ? (typeof claim.createdAt === 'object' && '_seconds' in (claim.createdAt as any))
+                                                            ? new Date((claim.createdAt as any)._seconds * 1000).toLocaleDateString()
+                                                            : new Date(claim.createdAt).toLocaleDateString()
+                                                        : 'N/A'
+                                                }</span>
+                                            </div>
                                         </div>
                                     </div>
-                                    </div>
-                                </div>
 
-                                {/* Primary Actions */}
-                                <div className="flex flex-wrap gap-2 pt-3 border-t border-white/[0.04]">
-                                    <button
-                                        onClick={() => navigate(`/claims/${claim.id}/chat`)}
-                                        className="btn-secondary text-xs flex items-center gap-2 py-2"
-                                    >
-                                        <MessageCircle className="w-3.5 h-3.5" />
-                                        <span>Chat</span>
-                                    </button>
-                                    <button
-                                        onClick={() => handleApprove(claim.id)}
-                                        disabled={actionLoading === claim.id}
-                                        className="btn-success text-xs flex items-center gap-2 py-2"
-                                    >
-                                        <Check className="w-3.5 h-3.5" />
-                                        <span>Approve</span>
-                                    </button>
-                                    <button
-                                        onClick={() => handleReject(claim.id)}
-                                        disabled={actionLoading === claim.id}
-                                        className="btn-danger text-xs flex items-center gap-2 py-2"
-                                    >
-                                        <X className="w-3.5 h-3.5" />
-                                        <span>Reject</span>
-                                    </button>
+                                    {/* Primary Actions */}
+                                    <div className="flex flex-wrap gap-2 pt-3 border-t border-white/[0.04]">
+                                        <button
+                                            onClick={() => navigate(`/claims/${claim.id}/chat`)}
+                                            className="btn-secondary text-xs flex items-center gap-2 py-2"
+                                        >
+                                            <MessageCircle className="w-3.5 h-3.5" />
+                                            <span>Chat</span>
+                                        </button>
+                                        <button
+                                            onClick={() => handleApprove(claim.id)}
+                                            disabled={actionLoading === claim.id}
+                                            className="btn-success text-xs flex items-center gap-2 py-2"
+                                        >
+                                            <Check className="w-3.5 h-3.5" />
+                                            <span>Approve</span>
+                                        </button>
+                                        <button
+                                            onClick={() => handleReject(claim.id)}
+                                            disabled={actionLoading === claim.id}
+                                            className="btn-danger text-xs flex items-center gap-2 py-2"
+                                        >
+                                            <X className="w-3.5 h-3.5" />
+                                            <span>Reject</span>
+                                        </button>
 
-                                    {claim.itemId && (
-                                        <>
+                                        {claim.itemId && (
                                             <button
-                                                onClick={() => navigate(`/admin/matches/${claim.itemId}?collection=${claim.item?.type === 'found' ? 'foundItems' : 'lostItems'}`)}
+                                                onClick={() => navigate(`/admin/verify/${claim.id}`)}
                                                 className="btn-secondary text-xs flex items-center gap-2 py-2 !border-violet-500/20 !text-violet-300 hover:!bg-violet-500/10"
                                             >
                                                 <Sparkles className="w-3.5 h-3.5" />
-                                                <span>AI Match</span>
+                                                <span>Verify Claim</span>
                                             </button>
-                                            <button
-                                                onClick={() => navigate(`/admin/cctv/${claim.id}`, { state: { itemId: claim.itemId } })}
-                                                className="btn-secondary text-xs flex items-center gap-2 py-2 !border-indigo-500/20 !text-indigo-300 hover:!bg-indigo-500/10"
-                                            >
-                                                <Video className="w-3.5 h-3.5" />
-                                                <span>CCTV</span>
-                                            </button>
-                                        </>
-                                    )}
-                                </div>
+                                        )}
+                                    </div>
 
-                                {/* Secondary Actions */}
-                                <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-white/[0.03]">
-                                    <button onClick={() => handleReopen(claim.id)} disabled={actionLoading === claim.id}
-                                        className="text-[11px] text-zinc-500 hover:text-zinc-200 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-surface-200 transition-all disabled:opacity-50">
-                                        <RotateCcw className="w-3 h-3" /><span>Reopen</span>
-                                    </button>
-                                    <button onClick={() => handleAddNote(claim.id)} disabled={actionLoading === claim.id}
-                                        className="text-[11px] text-zinc-500 hover:text-zinc-200 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-surface-200 transition-all disabled:opacity-50">
-                                        <StickyNote className="w-3 h-3" /><span>Note</span>
-                                    </button>
-                                    <button onClick={() => handleViewEvidence(claim.id)} disabled={actionLoading === claim.id}
-                                        className="text-[11px] text-zinc-500 hover:text-zinc-200 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-surface-200 transition-all disabled:opacity-50">
-                                        <FileSearch className="w-3 h-3" /><span>Evidence</span>
-                                    </button>
-                                    <button onClick={() => handleRequestProof(claim.id)} disabled={actionLoading === claim.id}
-                                        className="text-[11px] text-zinc-500 hover:text-zinc-200 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-surface-200 transition-all disabled:opacity-50">
-                                        <ShieldAlert className="w-3 h-3" /><span>Proof</span>
-                                    </button>
-                                    {claim.itemId && (
-                                        <button onClick={() => handleApproveSale(claim.id, claim.itemId)} disabled={actionLoading === claim.id}
-                                            className="text-[11px] text-amber-500/80 hover:text-amber-300 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-amber-500/10 transition-all disabled:opacity-50">
-                                            <DollarSign className="w-3 h-3" /><span>Sale</span>
+                                    {/* Secondary Actions */}
+                                    <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-white/[0.03]">
+                                        <button onClick={() => handleReopen(claim.id)} disabled={actionLoading === claim.id}
+                                            className="text-[11px] text-zinc-500 hover:text-zinc-200 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-surface-200 transition-all disabled:opacity-50">
+                                            <RotateCcw className="w-3 h-3" /><span>Reopen</span>
                                         </button>
-                                    )}
+                                        <button onClick={() => handleAddNote(claim.id)} disabled={actionLoading === claim.id}
+                                            className="text-[11px] text-zinc-500 hover:text-zinc-200 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-surface-200 transition-all disabled:opacity-50">
+                                            <StickyNote className="w-3 h-3" /><span>Note</span>
+                                        </button>
+                                        <button onClick={() => handleViewEvidence(claim.id)} disabled={actionLoading === claim.id}
+                                            className="text-[11px] text-zinc-500 hover:text-zinc-200 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-surface-200 transition-all disabled:opacity-50">
+                                            <FileSearch className="w-3 h-3" /><span>Evidence</span>
+                                        </button>
+                                        <button onClick={() => handleRequestProof(claim.id)} disabled={actionLoading === claim.id}
+                                            className="text-[11px] text-zinc-500 hover:text-zinc-200 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-surface-200 transition-all disabled:opacity-50">
+                                            <ShieldAlert className="w-3 h-3" /><span>Proof</span>
+                                        </button>
+                                        {claim.itemId && (
+                                            <button onClick={() => handleApproveSale(claim.id, claim.itemId)} disabled={actionLoading === claim.id}
+                                                className="text-[11px] text-amber-500/80 hover:text-amber-300 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-amber-500/10 transition-all disabled:opacity-50">
+                                                <DollarSign className="w-3 h-3" /><span>Sale</span>
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
+                            ))}
+                        </div>
+                    )
+                )}
+
+                {/* ═══ Returned Items List ═══ */}
+                {activeTab === 'returned' && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                        {returnedLoading ? (
+                            [...Array(6)].map((_, i) => <div key={i} className="skeleton h-[320px]" />)
+                        ) : returnedItems.length === 0 ? (
+                            <div className="card p-16 text-center col-span-full" style={{ transform: 'none' }}>
+                                <div className="w-16 h-16 rounded-2xl bg-surface-200 flex items-center justify-center mx-auto mb-4">
+                                    <Package className="w-8 h-8 text-zinc-600" />
+                                </div>
+                                <h3 className="text-lg font-semibold text-zinc-300 mb-2">No Returned Items</h3>
+                                <p className="text-zinc-500 text-sm">Items that have been successfully returned will appear here.</p>
                             </div>
-                        ))}
+                        ) : (
+                            returnedItems.map((item, idx) => (
+                                <div
+                                    key={item.id}
+                                    className="card overflow-hidden group animate-fade-in"
+                                    style={{ animationDelay: `${idx * 50}ms` }}
+                                >
+                                    {/* Image */}
+                                    <div className="relative h-48 bg-surface-200 flex items-center justify-center">
+                                        {item.imageUrl ? (
+                                            <img
+                                                src={item.imageUrl.startsWith('http') ? item.imageUrl : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${item.imageUrl}`}
+                                                alt={item.title}
+                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                            />
+                                        ) : (
+                                            <Package className="w-10 h-10 text-zinc-700" />
+                                        )}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent opacity-60" />
+                                        <div className="absolute top-3 right-3 text-[10px] font-bold tracking-widest text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded-md uppercase backdrop-blur-md">
+                                            Returned
+                                        </div>
+                                    </div>
+
+                                    {/* Content */}
+                                    <div className="p-5 space-y-3">
+                                        <h3 className="text-base font-semibold text-white">{item.title}</h3>
+                                        <p className="text-zinc-500 text-sm line-clamp-2 leading-relaxed">{item.description}</p>
+                                        <div className="flex flex-wrap items-center gap-4 text-[11px] text-zinc-600">
+                                            <div className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /><span>{new Date(item.createdAt).toLocaleDateString()}</span></div>
+                                            <div className="flex items-center gap-1.5 capitalize px-2 py-0.5 rounded-full bg-surface-200 border border-white/[0.04]">
+                                                {item.type} Item
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        )}
                     </div>
                 )}
             </div>

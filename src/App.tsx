@@ -91,7 +91,7 @@ const App: React.FC = () => {
             }
           />
           <Route
-            path="/admin/matches/:itemId"
+            path="/admin/verify/:claimId"
             element={
               <PrivateRoute>
                 <AdminRoute>

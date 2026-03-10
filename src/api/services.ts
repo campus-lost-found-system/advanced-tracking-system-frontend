@@ -15,9 +15,11 @@ export interface Item {
 export interface Claim {
     id: string;
     itemId: string;
+    lostItemId?: string;
     status: 'pending' | 'approved' | 'rejected';
     createdAt: string;
     item?: Item;
+    lostItem?: Item;
 }
 
 export interface ChatMessage {
@@ -51,6 +53,11 @@ export const getItems = async (type?: 'lost' | 'found') => {
     return data;
 };
 
+export const getReturnedItems = async () => {
+    const { data } = await api.get('/api/items', { params: { status: 'returned' } });
+    return data;
+};
+
 export const createItem = async (itemData: Partial<Item>) => {
     const { data } = await api.post('/api/items', itemData);
     return data;
@@ -62,8 +69,8 @@ export const uploadItemImage = async (itemId: string, imageBase64: string) => {
 };
 
 // Claims
-export const createClaim = async (itemId: string) => {
-    const { data } = await api.post('/api/claims', { itemId });
+export const createClaim = async (itemId: string, lostItemId: string) => {
+    const { data } = await api.post('/api/claims', { itemId, lostItemId });
     return data;
 };
 
@@ -116,6 +123,12 @@ export const extractFeatures = async (itemId: string, collection: 'lostItems' | 
 /** Compare item against opposite collection and return top-10 ranked suggestions */
 export const compareAndSuggest = async (itemId: string, collection: 'lostItems' | 'foundItems') => {
     const { data } = await api.post(`/api/ai/compare-and-suggest/${itemId}/${collection}`);
+    return data;
+};
+
+/** Unified claim verification: AI image comparison + CCTV verification (admin) */
+export const verifyClaimFull = async (claimId: string) => {
+    const { data } = await api.post(`/api/ai/verify-claim/${claimId}`);
     return data;
 };
 

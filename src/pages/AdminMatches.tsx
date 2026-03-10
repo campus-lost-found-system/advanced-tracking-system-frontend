@@ -1,8 +1,24 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { extractFeatures, compareAndSuggest } from '../api/services';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { verifyClaimFull, approveClaim, rejectClaim } from '../api/services';
 import Layout from '../components/Layout';
-import { ArrowLeft, Cpu, Search, Sparkles, CheckCircle2, XCircle, Loader2, Zap, Eye } from 'lucide-react';
+import api from '../api/axios';
+import {
+    ArrowLeft, Sparkles, CheckCircle2, XCircle, Loader2, Shield,
+    AlertTriangle, Package, MapPin, Check, X, Cpu, Video
+} from 'lucide-react';
+
+interface ClaimDetail {
+    id: string;
+    itemId: string;
+    lostItemId?: string;
+    status: string;
+    zone?: string;
+    dateOfLoss?: string;
+    timeOfLoss?: string;
+    item?: any;
+    lostItem?: any;
+}
 
 interface FeatureData {
     category?: string;
@@ -13,58 +29,104 @@ interface FeatureData {
     texture?: string;
 }
 
-interface SuggestionItem {
-    itemId: string;
-    title?: string;
-    description?: string;
-    zone?: string;
-    reportedDate?: string;
-    imageUrl?: string;
-    score: number;
-    matchingAttributes: string[];
-    mismatchedAttributes: string[];
-    features?: FeatureData;
+interface VerifyResult {
+    aiMatch?: {
+        similarity_score?: number;
+        matching_attributes?: string[];
+        mismatched_attributes?: string[];
+        lostFeatures?: FeatureData;
+        foundFeatures?: FeatureData;
+        error?: string;
+    };
+    cctvVerification?: {
+        match?: boolean;
+        confidence?: number;
+        reasoning?: string;
+        verdict?: string;
+        error?: string;
+    };
 }
 
 const AdminMatches: React.FC = () => {
-    const { itemId } = useParams<{ itemId: string }>();
-    const [searchParams] = useSearchParams();
-    const collection = (searchParams.get('collection') as 'lostItems' | 'foundItems') || 'lostItems';
+    const { claimId } = useParams<{ claimId: string }>();
     const navigate = useNavigate();
 
-    const [step, setStep] = useState<0 | 1 | 2>(0);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [features, setFeatures] = useState<FeatureData | null>(null);
-    const [suggestions, setSuggestions] = useState<SuggestionItem[] | null>(null);
+    const [claim, setClaim] = useState<ClaimDetail | null>(null);
+    const [claimLoading, setClaimLoading] = useState(true);
 
-    const handleExtractFeatures = async () => {
-        if (!itemId) return;
-        setLoading(true);
-        setError(null);
+    const [verifying, setVerifying] = useState(false);
+    const [verifyResult, setVerifyResult] = useState<VerifyResult | null>(null);
+    const [verifyError, setVerifyError] = useState<string | null>(null);
+
+    const [actionLoading, setActionLoading] = useState(false);
+
+    useEffect(() => {
+        if (claimId) loadClaim();
+    }, [claimId]);
+
+    const loadClaim = async () => {
+        setClaimLoading(true);
         try {
-            const res = await extractFeatures(itemId, collection);
-            setFeatures(res.data || res);
-            setStep(1);
-        } catch (e: any) {
-            setError(e.response?.data?.error || e.message || 'Failed to extract features');
+            // Fetch claim details from pending claims and find the one
+            const res = await api.get('/api/admin/claims/pending');
+            const claims = res.data?.data || [];
+            const found = claims.find((c: any) => c.id === claimId);
+            if (found) {
+                setClaim(found);
+            } else {
+                // Try fetching by directly constructing
+                setClaim({ id: claimId!, itemId: '', status: 'pending' });
+            }
+        } catch (err) {
+            console.error('Failed to load claim:', err);
         } finally {
-            setLoading(false);
+            setClaimLoading(false);
         }
     };
 
-    const handleCompareAndSuggest = async () => {
-        if (!itemId) return;
-        setLoading(true);
-        setError(null);
+    const handleVerify = async () => {
+        if (!claimId) return;
+        setVerifying(true);
+        setVerifyError(null);
+        setVerifyResult(null);
         try {
-            const res = await compareAndSuggest(itemId, collection);
-            setSuggestions(res.data || []);
-            setStep(2);
-        } catch (e: any) {
-            setError(e.response?.data?.error || e.message || 'Failed to compare items');
+            const res = await verifyClaimFull(claimId);
+            setVerifyResult(res.data || res);
+        } catch (err: any) {
+            setVerifyError(err.response?.data?.error || err.message || 'Verification failed');
         } finally {
-            setLoading(false);
+            setVerifying(false);
+        }
+    };
+
+    const handleApprove = async () => {
+        if (!claimId) return;
+        const remarks = prompt('Enter approval remarks (optional):');
+        setActionLoading(true);
+        try {
+            await approveClaim(claimId, remarks || undefined);
+            alert('Claim approved successfully!');
+            navigate('/admin');
+        } catch (err: any) {
+            alert(err.response?.data?.message || 'Failed to approve claim');
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleReject = async () => {
+        if (!claimId) return;
+        const remarks = prompt('Enter rejection reason:');
+        if (!remarks) return;
+        setActionLoading(true);
+        try {
+            await rejectClaim(claimId, remarks);
+            alert('Claim rejected.');
+            navigate('/admin');
+        } catch (err: any) {
+            alert(err.response?.data?.message || 'Failed to reject claim');
+        } finally {
+            setActionLoading(false);
         }
     };
 
@@ -74,10 +136,67 @@ const AdminMatches: React.FC = () => {
         return 'from-red-500 to-orange-600';
     };
 
-    const getScoreBadge = (score: number) => {
-        if (score >= 0.7) return { text: 'High', cls: 'badge-approved' };
-        if (score >= 0.5) return { text: 'Medium', cls: 'badge-pending' };
-        return { text: 'Low', cls: 'badge-rejected' };
+    const getScoreLabel = (score: number) => {
+        if (score >= 0.7) return { text: 'High Confidence', cls: 'text-emerald-400' };
+        if (score >= 0.5) return { text: 'Medium Confidence', cls: 'text-amber-400' };
+        return { text: 'Low Confidence', cls: 'text-red-400' };
+    };
+
+    const getVerdictStyle = (verdict?: string) => {
+        switch (verdict) {
+            case 'likely_valid':
+                return { bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', text: 'text-emerald-300', label: 'Likely Valid', icon: <CheckCircle2 className="w-5 h-5" /> };
+            case 'possibly_valid':
+                return { bg: 'bg-amber-500/10', border: 'border-amber-500/20', text: 'text-amber-300', label: 'Possibly Valid', icon: <AlertTriangle className="w-5 h-5" /> };
+            case 'likely_invalid':
+                return { bg: 'bg-red-500/10', border: 'border-red-500/20', text: 'text-red-300', label: 'Likely Invalid', icon: <XCircle className="w-5 h-5" /> };
+            default:
+                return { bg: 'bg-surface-200', border: 'border-white/[0.06]', text: 'text-zinc-300', label: verdict || 'Unknown', icon: <Shield className="w-5 h-5" /> };
+        }
+    };
+
+    const renderFeatures = (features: FeatureData | undefined, label: string) => {
+        if (!features) return null;
+        return (
+            <div>
+                <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-2 font-semibold">{label}</p>
+                <div className="grid grid-cols-2 gap-2">
+                    {features.category && (
+                        <div className="bg-surface rounded-lg border border-white/[0.04] p-2">
+                            <p className="text-[9px] text-zinc-600 uppercase">Category</p>
+                            <p className="text-white text-xs font-medium">{features.category}</p>
+                        </div>
+                    )}
+                    {features.colors && features.colors.length > 0 && (
+                        <div className="bg-surface rounded-lg border border-white/[0.04] p-2">
+                            <p className="text-[9px] text-zinc-600 uppercase">Colors</p>
+                            <div className="flex flex-wrap gap-1 mt-0.5">
+                                {features.colors.map((c, i) => (
+                                    <span key={i} className="text-[10px] badge">{c}</span>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    {features.shape && (
+                        <div className="bg-surface rounded-lg border border-white/[0.04] p-2">
+                            <p className="text-[9px] text-zinc-600 uppercase">Shape</p>
+                            <p className="text-white text-xs font-medium">{features.shape}</p>
+                        </div>
+                    )}
+                    {features.texture && (
+                        <div className="bg-surface rounded-lg border border-white/[0.04] p-2">
+                            <p className="text-[9px] text-zinc-600 uppercase">Texture</p>
+                            <p className="text-white text-xs font-medium">{features.texture}</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+    };
+
+    const imgSrc = (url?: string) => {
+        if (!url) return '';
+        return url.startsWith('http') ? url : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${url}`;
     };
 
     return (
@@ -86,225 +205,309 @@ const AdminMatches: React.FC = () => {
                 {/* Back */}
                 <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-zinc-500 hover:text-white text-sm transition-colors">
                     <ArrowLeft className="w-4 h-4" />
-                    <span>Back</span>
+                    <span>Back to Dashboard</span>
                 </button>
 
-                {/* Item info */}
-                <div className="flex items-center gap-3 text-sm text-zinc-500">
-                    <span>Item: <code className="text-zinc-300 bg-surface-200 px-2 py-0.5 rounded-lg text-xs">{itemId}</code></span>
-                    <span className="text-zinc-700">·</span>
-                    <span>Collection: <span className="text-zinc-300">{collection === 'lostItems' ? 'Lost Items' : 'Found Items'}</span></span>
-                </div>
-
-                {/* Step Progress */}
-                <div className="flex items-center gap-3">
-                    {[
-                        { label: 'Extract Features', icon: Eye, done: step >= 1 },
-                        { label: 'Compare & Suggest', icon: Search, done: step >= 2 },
-                    ].map((s, idx) => (
-                        <React.Fragment key={s.label}>
-                            {idx > 0 && <div className={`w-12 h-0.5 rounded-full ${s.done ? 'bg-accent/50' : 'bg-surface-300'}`} />}
-                            <div className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border transition-all ${s.done
-                                    ? 'bg-accent/10 border-accent/20 text-accent-light'
-                                    : (step === idx)
-                                        ? 'bg-surface-200 border-white/[0.08] text-white'
-                                        : 'bg-surface-100 border-white/[0.04] text-zinc-600'
-                                }`}>
-                                {s.done ? <CheckCircle2 className="w-4 h-4" /> : <s.icon className="w-4 h-4" />}
-                                <span>{idx + 1}. {s.label}</span>
-                            </div>
-                        </React.Fragment>
-                    ))}
-                </div>
-
-                {/* Error */}
-                {error && (
-                    <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-center gap-3 animate-scale-in">
-                        <XCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
-                        <p className="text-red-300 text-sm">{error}</p>
+                {claimLoading ? (
+                    <div className="space-y-4">
+                        {[...Array(3)].map((_, i) => <div key={i} className="skeleton h-32" />)}
                     </div>
-                )}
+                ) : (
+                    <>
+                        {/* ═══ Claim Header: Lost vs Found ═══ */}
+                        <div className="card p-6" style={{ transform: 'none' }}>
+                            <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-3">
+                                <Sparkles className="w-5 h-5 text-violet-400" />
+                                Claim Verification
+                                <span className="text-xs badge bg-surface-200 text-zinc-400 border border-white/[0.04] ml-auto">{claimId?.slice(0, 8)}...</span>
+                            </h2>
 
-                {/* Loading */}
-                {loading && (
-                    <div className="card p-5 flex items-center gap-4 animate-scale-in" style={{ transform: 'none' }}>
-                        <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
-                            <Loader2 className="w-5 h-5 text-accent-light animate-spin" />
-                        </div>
-                        <div>
-                            <p className="text-sm font-medium text-indigo-200">
-                                {step === 0 ? 'Analyzing image with Groq Vision AI...' : 'Comparing against all items...'}
-                            </p>
-                            <p className="text-xs text-zinc-600 mt-0.5">This may take a moment</p>
-                        </div>
-                    </div>
-                )}
-
-                {/* ═══ Step 1: Extract Features ═══ */}
-                <div className={`card p-6 ${step === 0 ? '!border-white/[0.08]' : ''}`} style={{ transform: 'none' }}>
-                    <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-xl bg-indigo-500/10 flex items-center justify-center">
-                                <Cpu className="w-[18px] h-[18px] text-indigo-400" />
-                            </div>
-                            <h2 className="text-base font-semibold text-white">Feature Extraction</h2>
-                        </div>
-                        {step === 0 && (
-                            <button onClick={handleExtractFeatures} disabled={loading} className="btn-primary text-xs flex items-center gap-2 py-2.5">
-                                <Zap className="w-3.5 h-3.5" /><span>Extract</span>
-                            </button>
-                        )}
-                        {step >= 1 && <CheckCircle2 className="w-5 h-5 text-emerald-400" />}
-                    </div>
-
-                    {features && (
-                        <div className="mt-5 grid grid-cols-2 md:grid-cols-3 gap-3">
-                            {features.category && (
-                                <div className="bg-surface rounded-xl border border-white/[0.04] p-3">
-                                    <p className="text-[10px] text-zinc-600 uppercase tracking-widest mb-1">Category</p>
-                                    <p className="text-white font-medium text-sm">{features.category}</p>
-                                </div>
-                            )}
-                            {features.colors && features.colors.length > 0 && (
-                                <div className="bg-surface rounded-xl border border-white/[0.04] p-3">
-                                    <p className="text-[10px] text-zinc-600 uppercase tracking-widest mb-1">Colors</p>
-                                    <div className="flex flex-wrap gap-1">
-                                        {features.colors.map((c, i) => (
-                                            <span key={i} className="badge text-[10px]">{c}</span>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                            {features.shape && (
-                                <div className="bg-surface rounded-xl border border-white/[0.04] p-3">
-                                    <p className="text-[10px] text-zinc-600 uppercase tracking-widest mb-1">Shape</p>
-                                    <p className="text-white font-medium text-sm">{features.shape}</p>
-                                </div>
-                            )}
-                            {features.size_estimate && (
-                                <div className="bg-surface rounded-xl border border-white/[0.04] p-3">
-                                    <p className="text-[10px] text-zinc-600 uppercase tracking-widest mb-1">Size</p>
-                                    <p className="text-white font-medium text-sm">{features.size_estimate}</p>
-                                </div>
-                            )}
-                            {features.texture && (
-                                <div className="bg-surface rounded-xl border border-white/[0.04] p-3">
-                                    <p className="text-[10px] text-zinc-600 uppercase tracking-widest mb-1">Texture</p>
-                                    <p className="text-white font-medium text-sm">{features.texture}</p>
-                                </div>
-                            )}
-                            {features.distinctive_features && features.distinctive_features.length > 0 && (
-                                <div className="bg-surface rounded-xl border border-white/[0.04] p-3 col-span-2 md:col-span-3">
-                                    <p className="text-[10px] text-zinc-600 uppercase tracking-widest mb-2">Distinctive Features</p>
-                                    <div className="flex flex-wrap gap-1.5">
-                                        {features.distinctive_features.map((f, i) => (
-                                            <span key={i} className="badge bg-accent/10 text-accent-light border border-accent/20">{f}</span>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </div>
-
-                {/* ═══ Step 2: Compare & Suggest ═══ */}
-                <div className={`card p-6 transition-opacity ${step < 1 ? 'opacity-40' : ''} ${step === 1 ? '!border-white/[0.08]' : ''}`} style={{ transform: 'none' }}>
-                    <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-xl bg-violet-500/10 flex items-center justify-center">
-                                <Search className="w-[18px] h-[18px] text-violet-400" />
-                            </div>
-                            <h2 className="text-base font-semibold text-white">Compare & Suggest</h2>
-                        </div>
-                        {step === 1 && (
-                            <button onClick={handleCompareAndSuggest} disabled={loading} className="btn-primary text-xs flex items-center gap-2 py-2.5 !bg-gradient-to-r !from-violet-600 !to-purple-600">
-                                <Search className="w-3.5 h-3.5" /><span>Find Matches</span>
-                            </button>
-                        )}
-                        {step >= 2 && <CheckCircle2 className="w-5 h-5 text-emerald-400" />}
-                    </div>
-                    <p className="text-zinc-600 text-xs mt-2 ml-12">
-                        Compares this {collection === 'lostItems' ? 'lost' : 'found'} item against all {collection === 'lostItems' ? 'found' : 'lost'} items with extracted features.
-                    </p>
-                </div>
-
-                {/* ═══ Suggestions ═══ */}
-                {step >= 2 && suggestions !== null && (
-                    <div className="space-y-4 animate-fade-in">
-                        <div className="flex items-center gap-3">
-                            <Sparkles className="w-5 h-5 text-amber-400" />
-                            <h2 className="text-lg font-bold text-white">Top Matches</h2>
-                            <span className="badge bg-surface-200 text-zinc-400 border border-white/[0.04]">
-                                {suggestions.length} result{suggestions.length !== 1 ? 's' : ''}
-                            </span>
-                        </div>
-
-                        {suggestions.length === 0 ? (
-                            <div className="card p-12 text-center" style={{ transform: 'none' }}>
-                                <p className="text-zinc-500">No matching items found above threshold.</p>
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                {suggestions.map((s, idx) => {
-                                    const badge = getScoreBadge(s.score);
-                                    return (
-                                        <div key={s.itemId} className="card p-5 animate-fade-in" style={{ animationDelay: `${idx * 80}ms` }}>
-                                            <div className="flex justify-between items-start mb-3">
-                                                <div className="flex items-start gap-3">
-                                                    <span className="text-xs font-bold text-zinc-600 bg-surface-200 w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0">
-                                                        #{idx + 1}
-                                                    </span>
-                                                    <div>
-                                                        <h3 className="text-sm font-semibold text-white">{s.title || s.itemId}</h3>
-                                                        {s.description && <p className="text-zinc-600 text-xs mt-1 line-clamp-2">{s.description}</p>}
-                                                    </div>
-                                                </div>
-                                                <span className={`badge ${badge.cls}`}>{badge.text}</span>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {/* Found Item */}
+                                <div className="bg-surface rounded-xl border border-emerald-500/15 p-4">
+                                    <p className="text-[10px] text-emerald-400 uppercase tracking-widest mb-3 font-semibold">Found Item</p>
+                                    <div className="flex items-start gap-3">
+                                        <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-surface-200 flex items-center justify-center">
+                                            {claim?.item?.imageUrl ? (
+                                                <img src={imgSrc(claim.item.imageUrl)} alt={claim.item?.title} className="w-full h-full object-cover" />
+                                            ) : (
+                                                <Package className="w-8 h-8 text-zinc-700" />
+                                            )}
+                                        </div>
+                                        <div className="min-w-0">
+                                            <p className="text-sm font-semibold text-white">{claim?.item?.title || '—'}</p>
+                                            <p className="text-xs text-zinc-500 line-clamp-2 mt-1">{claim?.item?.description || ''}</p>
+                                            <div className="flex items-center gap-3 mt-2 text-[11px] text-zinc-600">
+                                                {claim?.item?.location && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{claim.item.location}</span>}
                                             </div>
+                                        </div>
+                                    </div>
+                                </div>
 
-                                            {/* Score */}
-                                            <div className="mb-3">
-                                                <div className="flex justify-between mb-1.5">
-                                                    <span className="text-[11px] text-zinc-500">Match Score</span>
-                                                    <span className="text-sm text-white font-bold">{(s.score * 100).toFixed(0)}%</span>
+                                {/* Lost Item */}
+                                <div className="bg-surface rounded-xl border border-red-500/15 p-4">
+                                    <p className="text-[10px] text-red-400 uppercase tracking-widest mb-3 font-semibold">Claimant's Lost Item</p>
+                                    {claim?.lostItem ? (
+                                        <div className="flex items-start gap-3">
+                                            <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-surface-200 flex items-center justify-center">
+                                                {claim.lostItem.imageUrl ? (
+                                                    <img src={imgSrc(claim.lostItem.imageUrl)} alt={claim.lostItem?.title} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <Package className="w-8 h-8 text-zinc-700" />
+                                                )}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <p className="text-sm font-semibold text-white">{claim.lostItem?.title || '—'}</p>
+                                                <p className="text-xs text-zinc-500 line-clamp-2 mt-1">{claim.lostItem?.description || ''}</p>
+                                                <div className="flex items-center gap-3 mt-2 text-[11px] text-zinc-600">
+                                                    {claim.lostItem?.location && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{claim.lostItem.location}</span>}
                                                 </div>
-                                                <div className="w-full bg-surface-300 rounded-full h-2 overflow-hidden">
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <p className="text-sm text-zinc-600 italic">No linked lost item</p>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Report Metadata */}
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+                                {claim?.zone && (
+                                    <div className="bg-surface rounded-xl border border-white/[0.04] p-3">
+                                        <p className="text-[10px] text-red-400 uppercase tracking-widest mb-1">📍 Location</p>
+                                        <p className="text-white font-medium text-sm">{claim.zone}</p>
+                                    </div>
+                                )}
+                                {claim?.dateOfLoss && (
+                                    <div className="bg-surface rounded-xl border border-white/[0.04] p-3">
+                                        <p className="text-[10px] text-blue-400 uppercase tracking-widest mb-1">📅 Date</p>
+                                        <p className="text-white font-medium text-sm">{claim.dateOfLoss}</p>
+                                    </div>
+                                )}
+                                {claim?.timeOfLoss && (
+                                    <div className="bg-surface rounded-xl border border-white/[0.04] p-3">
+                                        <p className="text-[10px] text-green-400 uppercase tracking-widest mb-1">🕐 Time Window</p>
+                                        <p className="text-white font-medium text-sm">{claim.timeOfLoss}</p>
+                                    </div>
+                                )}
+                                {claim?.item?.category && (
+                                    <div className="bg-surface rounded-xl border border-white/[0.04] p-3">
+                                        <p className="text-[10px] text-amber-400 uppercase tracking-widest mb-1">📦 Category</p>
+                                        <p className="text-white font-medium text-sm">{claim.item.category}</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* ═══ Run Verification Button ═══ */}
+                        {!verifyResult && !verifying && (
+                            <div className="card p-6" style={{ transform: 'none' }}>
+                                <div className="flex justify-between items-center">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500/20 to-indigo-500/20 flex items-center justify-center">
+                                            <Sparkles className="w-5 h-5 text-violet-400" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-base font-semibold text-white">Run AI + CCTV Verification</h3>
+                                            <p className="text-xs text-zinc-600">Extracts features from both items, compares them, and checks CCTV logs</p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={handleVerify}
+                                        className="btn-primary text-sm flex items-center gap-2 py-2.5 px-5"
+                                    >
+                                        <Sparkles className="w-4 h-4" />
+                                        <span>Verify Now</span>
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Loading */}
+                        {verifying && (
+                            <div className="card p-6 flex items-center gap-4 animate-scale-in" style={{ transform: 'none' }}>
+                                <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
+                                    <Loader2 className="w-5 h-5 text-accent-light animate-spin" />
+                                </div>
+                                <div>
+                                    <p className="text-sm font-medium text-indigo-200">Running AI image comparison & CCTV analysis...</p>
+                                    <p className="text-xs text-zinc-600 mt-0.5">This may take 15-30 seconds</p>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Error */}
+                        {verifyError && (
+                            <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-center gap-3 animate-scale-in">
+                                <XCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+                                <p className="text-red-300 text-sm">{verifyError}</p>
+                            </div>
+                        )}
+
+                        {/* ═══ Verification Results ═══ */}
+                        {verifyResult && (
+                            <div className="space-y-6 animate-fade-in">
+
+                                {/* Section 1: AI Image Match */}
+                                <div className="card p-6" style={{ transform: 'none' }}>
+                                    <div className="flex items-center gap-3 mb-5">
+                                        <div className="w-9 h-9 rounded-xl bg-violet-500/10 flex items-center justify-center">
+                                            <Cpu className="w-[18px] h-[18px] text-violet-400" />
+                                        </div>
+                                        <h3 className="text-base font-semibold text-white">AI Image Match</h3>
+                                    </div>
+
+                                    {verifyResult.aiMatch?.error ? (
+                                        <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-sm text-red-300">
+                                            {verifyResult.aiMatch.error}
+                                        </div>
+                                    ) : verifyResult.aiMatch ? (
+                                        <div className="space-y-5">
+                                            {/* Score */}
+                                            <div>
+                                                <div className="flex justify-between items-end mb-2">
+                                                    <span className={`text-sm font-semibold ${getScoreLabel(verifyResult.aiMatch.similarity_score || 0).cls}`}>
+                                                        {getScoreLabel(verifyResult.aiMatch.similarity_score || 0).text}
+                                                    </span>
+                                                    <span className="text-3xl font-bold text-white">
+                                                        {((verifyResult.aiMatch.similarity_score || 0) * 100).toFixed(0)}%
+                                                    </span>
+                                                </div>
+                                                <div className="w-full bg-surface-300 rounded-full h-3 overflow-hidden">
                                                     <div
-                                                        className={`h-full rounded-full bg-gradient-to-r ${getScoreColor(s.score)} transition-all duration-700`}
-                                                        style={{ width: `${Math.min(s.score * 100, 100)}%` }}
+                                                        className={`h-full rounded-full bg-gradient-to-r ${getScoreColor(verifyResult.aiMatch.similarity_score || 0)} transition-all duration-1000`}
+                                                        style={{ width: `${Math.min((verifyResult.aiMatch.similarity_score || 0) * 100, 100)}%` }}
                                                     />
                                                 </div>
                                             </div>
 
-                                            {/* Meta */}
-                                            <div className="flex items-center gap-4 text-[11px] text-zinc-600 mb-3">
-                                                {s.zone && <span>📍 {s.zone}</span>}
-                                                {s.reportedDate && <span>📅 {new Date(s.reportedDate).toLocaleDateString()}</span>}
+                                            {/* Matching / Mismatched Attributes */}
+                                            <div className="flex flex-wrap gap-4">
+                                                {verifyResult.aiMatch.matching_attributes && verifyResult.aiMatch.matching_attributes.length > 0 && (
+                                                    <div>
+                                                        <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1.5">Matching</p>
+                                                        <div className="flex flex-wrap gap-1">
+                                                            {verifyResult.aiMatch.matching_attributes.map((a, i) => (
+                                                                <span key={i} className="badge badge-approved text-[10px]">✓ {a}</span>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                {verifyResult.aiMatch.mismatched_attributes && verifyResult.aiMatch.mismatched_attributes.length > 0 && (
+                                                    <div>
+                                                        <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1.5">Mismatched</p>
+                                                        <div className="flex flex-wrap gap-1">
+                                                            {verifyResult.aiMatch.mismatched_attributes.map((a, i) => (
+                                                                <span key={i} className="badge badge-rejected text-[10px]">✗ {a}</span>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
                                             </div>
 
-                                            {/* Attributes */}
-                                            <div className="space-y-2">
-                                                {s.matchingAttributes.length > 0 && (
-                                                    <div className="flex flex-wrap gap-1">
-                                                        {s.matchingAttributes.map((a, i) => (
-                                                            <span key={i} className="badge badge-approved text-[10px]">✓ {a}</span>
-                                                        ))}
-                                                    </div>
-                                                )}
-                                                {s.mismatchedAttributes.length > 0 && (
-                                                    <div className="flex flex-wrap gap-1">
-                                                        {s.mismatchedAttributes.map((a, i) => (
-                                                            <span key={i} className="badge badge-rejected text-[10px]">✗ {a}</span>
-                                                        ))}
-                                                    </div>
-                                                )}
+                                            {/* Features comparison */}
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-white/[0.04]">
+                                                {renderFeatures(verifyResult.aiMatch.lostFeatures, 'Lost Item Features')}
+                                                {renderFeatures(verifyResult.aiMatch.foundFeatures, 'Found Item Features')}
                                             </div>
                                         </div>
-                                    );
-                                })}
+                                    ) : null}
+                                </div>
+
+                                {/* Section 2: CCTV Verification */}
+                                <div className="card p-6" style={{ transform: 'none' }}>
+                                    <div className="flex items-center gap-3 mb-5">
+                                        <div className="w-9 h-9 rounded-xl bg-indigo-500/10 flex items-center justify-center">
+                                            <Video className="w-[18px] h-[18px] text-indigo-400" />
+                                        </div>
+                                        <h3 className="text-base font-semibold text-white">CCTV Verification</h3>
+                                    </div>
+
+                                    {verifyResult.cctvVerification?.error ? (
+                                        <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 text-sm text-amber-300">
+                                            <p className="font-medium mb-1">CCTV check unavailable</p>
+                                            <p className="text-xs text-amber-400/70">{verifyResult.cctvVerification.error}</p>
+                                        </div>
+                                    ) : verifyResult.cctvVerification ? (
+                                        <div className="space-y-4">
+                                            {/* Verdict Badge */}
+                                            {(() => {
+                                                const style = getVerdictStyle(verifyResult.cctvVerification.verdict);
+                                                return (
+                                                    <div className={`flex items-center justify-between p-4 rounded-xl border ${style.bg} ${style.border}`}>
+                                                        <div className="flex items-center gap-3">
+                                                            <span className={style.text}>{style.icon}</span>
+                                                            <div>
+                                                                <p className={`font-semibold ${style.text}`}>{style.label}</p>
+                                                                <p className="text-[11px] text-zinc-600">CCTV AI Verdict</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-right">
+                                                            <span className="text-3xl font-bold text-white">
+                                                                {((verifyResult.cctvVerification.confidence || 0) * 100).toFixed(0)}%
+                                                            </span>
+                                                            <p className="text-[11px] text-zinc-600">Confidence</p>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })()}
+
+                                            {/* Confidence Bar */}
+                                            <div className="w-full bg-surface-300 rounded-full h-2.5 overflow-hidden">
+                                                <div
+                                                    className={`h-full rounded-full transition-all duration-1000 ${(verifyResult.cctvVerification.confidence || 0) >= 0.7
+                                                        ? 'bg-gradient-to-r from-emerald-500 to-green-500'
+                                                        : (verifyResult.cctvVerification.confidence || 0) >= 0.4
+                                                            ? 'bg-gradient-to-r from-amber-500 to-yellow-500'
+                                                            : 'bg-gradient-to-r from-red-500 to-orange-500'
+                                                        }`}
+                                                    style={{ width: `${(verifyResult.cctvVerification.confidence || 0) * 100}%` }}
+                                                />
+                                            </div>
+
+                                            {/* Match + Reasoning */}
+                                            <div className="flex items-center gap-2 text-sm">
+                                                <span className="text-zinc-500">Match:</span>
+                                                <span className={verifyResult.cctvVerification.match ? 'text-emerald-400 font-medium' : 'text-red-400 font-medium'}>
+                                                    {verifyResult.cctvVerification.match ? '✓ Yes' : '✗ No'}
+                                                </span>
+                                            </div>
+
+                                            {verifyResult.cctvVerification.reasoning && (
+                                                <div className="bg-surface rounded-xl border border-white/[0.04] p-4">
+                                                    <p className="text-[10px] text-zinc-600 uppercase tracking-widest mb-2">AI Reasoning</p>
+                                                    <p className="text-zinc-300 text-sm leading-relaxed">{verifyResult.cctvVerification.reasoning}</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ) : null}
+                                </div>
+
+                                {/* ═══ Admin Decision ═══ */}
+                                <div className="card p-6" style={{ transform: 'none' }}>
+                                    <h3 className="text-base font-semibold text-white mb-4">Admin Decision</h3>
+                                    <div className="flex gap-4">
+                                        <button
+                                            onClick={handleApprove}
+                                            disabled={actionLoading}
+                                            className="flex-1 btn-success py-3 text-sm flex items-center justify-center gap-2 font-semibold"
+                                        >
+                                            <Check className="w-4 h-4" />
+                                            <span>Approve</span>
+                                        </button>
+                                        <button
+                                            onClick={handleReject}
+                                            disabled={actionLoading}
+                                            className="flex-1 btn-danger py-3 text-sm flex items-center justify-center gap-2 font-semibold"
+                                        >
+                                            <X className="w-4 h-4" />
+                                            <span>Reject</span>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         )}
-                    </div>
+                    </>
                 )}
             </div>
         </Layout>
