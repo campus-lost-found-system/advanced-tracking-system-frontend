@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import {
     LogOut, Home, Package, FileText, User, Shield, Menu,
-    Search, ChevronRight, Sparkles
+    Search, ChevronRight, Sparkles, ShoppingBag
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -29,7 +29,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         { path: '/', label: 'Browse Items', icon: Home, color: 'bg-indigo-500/20 text-indigo-400' },
         { path: '/report', label: 'Report Item', icon: Package, color: 'bg-violet-500/20 text-violet-400' },
         { path: '/my-claims', label: 'My Claims', icon: FileText, color: 'bg-emerald-500/20 text-emerald-400' },
-        { path: '/profile', label: 'Profile', icon: User, color: 'bg-amber-500/20 text-amber-400' },
+        { path: '/shop', label: 'Shop', icon: ShoppingBag, color: 'bg-amber-500/20 text-amber-400' },
+        { path: '/profile', label: 'Profile', icon: User, color: 'bg-zinc-500/20 text-zinc-400' },
     ];
 
     const adminNavItems = [
@@ -48,6 +49,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             '/my-claims': 'My Claims',
             '/admin': 'Admin Dashboard',
             '/profile': 'Profile',
+            '/shop': 'Shop',
         };
         if (location.pathname.startsWith('/admin/matches')) return 'AI Match Analysis';
         if (location.pathname.startsWith('/admin/cctv')) return 'CCTV Verification';

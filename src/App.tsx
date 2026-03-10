@@ -10,6 +10,7 @@ import Admin from './pages/Admin';
 import Profile from './pages/Profile';
 import AdminMatches from './pages/AdminMatches';
 import AdminCCTV from './pages/AdminCCTV';
+import Shop from './pages/Shop';
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
@@ -77,6 +78,14 @@ const App: React.FC = () => {
             element={
               <PrivateRoute>
                 <ClaimChat />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/shop"
+            element={
+              <PrivateRoute>
+                <Shop />
               </PrivateRoute>
             }
           />

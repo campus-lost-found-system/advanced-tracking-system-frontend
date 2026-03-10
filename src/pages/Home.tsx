@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getItems, createClaim, buyItem, getMyItems, Item } from '../api/services';
-import { Search, MapPin, Calendar, Plus, AlertCircle, ShoppingCart, Package, TrendingUp, Eye, X, Loader2 } from 'lucide-react';
+import { getItems, createClaim, approveSale, getMyItems, Item } from '../api/services';
+import { Search, MapPin, Calendar, Plus, AlertCircle, IndianRupee, Package, TrendingUp, Eye, X, Loader2 } from 'lucide-react';
 import Layout from '../components/Layout';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -12,7 +12,7 @@ const Home: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [buyLoading, setBuyLoading] = useState<string | null>(null);
+    const [actionLoading, setActionLoading] = useState<string | null>(null);
     const navigate = useNavigate();
 
     // Claim modal state
@@ -74,17 +74,24 @@ const Home: React.FC = () => {
         }
     };
 
-    const handleBuy = async (itemId: string) => {
-        if (!confirm('Are you sure you want to purchase this item?')) return;
-        setBuyLoading(itemId);
+    const handlePutOnSale = async (itemId: string) => {
+        const priceStr = prompt('Enter the price (₹) to list this item for sale:');
+        if (!priceStr) return;
+        const price = parseFloat(priceStr);
+        if (isNaN(price) || price <= 0) {
+            alert('Please enter a valid positive price.');
+            return;
+        }
+
+        setActionLoading(itemId);
         try {
-            await buyItem(itemId);
-            alert('Purchase successful!');
+            await approveSale(itemId, price);
+            alert('Item successfully listed for sale! It has been moved to the Shop.');
             await fetchItems();
         } catch (error: any) {
-            alert(error.response?.data?.error || 'Failed to purchase item');
+            alert(error.response?.data?.message || 'Failed to list item for sale');
         } finally {
-            setBuyLoading(null);
+            setActionLoading(null);
         }
     };
 
@@ -254,7 +261,7 @@ const Home: React.FC = () => {
                                                 item.createdAt
                                                     ? (typeof item.createdAt === 'object' && '_seconds' in (item.createdAt as any))
                                                         ? new Date((item.createdAt as any)._seconds * 1000).toLocaleDateString()
-                                                        : new Date(item.createdAt).toLocaleDateString()
+                                                        : new Date(item.createdAt as string).toLocaleDateString()
                                                     : 'N/A'
                                             }</span>
                                         </div>
@@ -270,14 +277,19 @@ const Home: React.FC = () => {
                                                 Claim This Item
                                             </button>
                                         )}
-                                        {(item as any).saleEligible && userProfile?.role !== 'admin' && (
+                                        {/* Admin Action: Put on Sale */}
+                                        {userProfile?.role === 'admin' && item.type === 'found' && !['returned', 'sold', 'for_sale'].includes(item.status) && (
                                             <button
-                                                onClick={() => handleBuy(item.id)}
-                                                disabled={buyLoading === item.id}
-                                                className="w-full btn-success py-2.5 text-sm flex items-center justify-center gap-2"
+                                                onClick={() => handlePutOnSale(item.id)}
+                                                disabled={actionLoading === item.id}
+                                                className="w-full btn flex items-center justify-center gap-2 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 py-2.5 text-sm"
                                             >
-                                                <ShoppingCart className="w-4 h-4" />
-                                                <span>{buyLoading === item.id ? 'Processing...' : `Buy · ₹${(item as any).price || '?'}`}</span>
+                                                {actionLoading === item.id ? (
+                                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                                ) : (
+                                                    <IndianRupee className="w-4 h-4" />
+                                                )}
+                                                <span>{actionLoading === item.id ? 'Processing...' : 'Put on Sale'}</span>
                                             </button>
                                         )}
                                         {item.status === 'returned' && (
@@ -338,8 +350,8 @@ const Home: React.FC = () => {
                                             key={lostItem.id}
                                             onClick={() => setSelectedLostItemId(lostItem.id)}
                                             className={`w-full flex items-center gap-3 p-3 rounded-xl border text-left transition-all ${selectedLostItemId === lostItem.id
-                                                    ? 'border-accent/40 bg-accent/10 ring-1 ring-accent/20'
-                                                    : 'border-white/[0.06] bg-surface-100 hover:bg-surface-200 hover:border-white/[0.1]'
+                                                ? 'border-accent/40 bg-accent/10 ring-1 ring-accent/20'
+                                                : 'border-white/[0.06] bg-surface-100 hover:bg-surface-200 hover:border-white/[0.1]'
                                                 }`}
                                         >
                                             {/* Thumbnail */}

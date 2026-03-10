@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
     getPendingClaims, approveClaim, rejectClaim, reopenClaim,
     addClaimNote, getClaimEvidence, requestProof, getAnalytics,
-    seedCctvLogs, approveSale, getReturnedItems, Claim, Item
+    seedCctvLogs, approveSale, getReturnedItems, getForSaleItems, markItemSold, Claim, Item
 } from '../api/services';
 import {
     Check, X, Calendar, MessageCircle, Sparkles,
@@ -35,15 +35,31 @@ const Admin: React.FC = () => {
     const [evidenceClaimId, setEvidenceClaimId] = useState<string | null>(null);
     const [evidenceLoading, setEvidenceLoading] = useState(false);
 
-    const [activeTab, setActiveTab] = useState<'claims' | 'returned'>('claims');
+    const [activeTab, setActiveTab] = useState<'claims' | 'returned' | 'sale'>('claims');
     const [returnedItems, setReturnedItems] = useState<Item[]>([]);
     const [returnedLoading, setReturnedLoading] = useState(false);
+
+    const [forSaleItems, setForSaleItems] = useState<Item[]>([]);
+    const [saleLoading, setSaleLoading] = useState(false);
 
     useEffect(() => {
         fetchPendingClaims();
         fetchAnalytics();
         fetchReturnedItems();
+        fetchForSaleItems();
     }, []);
+
+    const fetchForSaleItems = async () => {
+        setSaleLoading(true);
+        try {
+            const res = await getForSaleItems();
+            setForSaleItems(res.data || []);
+        } catch (error) {
+            console.error('Failed to fetch for sale items', error);
+        } finally {
+            setSaleLoading(false);
+        }
+    };
 
     const fetchReturnedItems = async () => {
         setReturnedLoading(true);
@@ -78,6 +94,20 @@ const Admin: React.FC = () => {
             console.error('Failed to fetch analytics:', error);
         } finally {
             setAnalyticsLoading(false);
+        }
+    };
+
+    const handleMarkSold = async (itemId: string) => {
+        if (!confirm('Mark this item as sold? It will be removed from the public shop.')) return;
+        try {
+            setActionLoading(itemId);
+            await markItemSold(itemId);
+            alert('Item marked as sold successfully!');
+            await fetchForSaleItems();
+        } catch (error: any) {
+            alert(error.response?.data?.message || 'Failed to mark as sold');
+        } finally {
+            setActionLoading(null);
         }
     };
 
@@ -305,6 +335,13 @@ const Admin: React.FC = () => {
                         Returned Items ({returnedItems.length})
                         {activeTab === 'returned' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent rounded-t-full" />}
                     </button>
+                    <button
+                        onClick={() => setActiveTab('sale')}
+                        className={`pb-3 text-sm font-medium transition-colors relative ${activeTab === 'sale' ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
+                    >
+                        For Sale ({forSaleItems.length})
+                        {activeTab === 'sale' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent rounded-t-full" />}
+                    </button>
                 </div>
 
                 {/* ═══ Pending Claims List ═══ */}
@@ -510,11 +547,99 @@ const Admin: React.FC = () => {
                                         <h3 className="text-base font-semibold text-white">{item.title}</h3>
                                         <p className="text-zinc-500 text-sm line-clamp-2 leading-relaxed">{item.description}</p>
                                         <div className="flex flex-wrap items-center gap-4 text-[11px] text-zinc-600">
-                                            <div className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /><span>{new Date(item.createdAt).toLocaleDateString()}</span></div>
+                                            <div className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /><span>{
+                                                item.createdAt
+                                                    ? (typeof item.createdAt === 'object' && '_seconds' in (item.createdAt as any))
+                                                        ? new Date((item.createdAt as any)._seconds * 1000).toLocaleDateString()
+                                                        : new Date(item.createdAt as string).toLocaleDateString()
+                                                    : 'N/A'
+                                            }</span></div>
                                             <div className="flex items-center gap-1.5 capitalize px-2 py-0.5 rounded-full bg-surface-200 border border-white/[0.04]">
                                                 {item.type} Item
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                )}
+                {/* ═══ For Sale Items Tab ═══ */}
+                {activeTab === 'sale' && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                        {saleLoading ? (
+                            [...Array(3)].map((_, i) => <div key={i} className="skeleton h-48" />)
+                        ) : forSaleItems.length === 0 ? (
+                            <div className="col-span-full card p-16 text-center" style={{ transform: 'none' }}>
+                                <div className="w-16 h-16 rounded-2xl bg-surface-200 flex items-center justify-center mx-auto mb-4">
+                                    <DollarSign className="w-8 h-8 text-zinc-600" />
+                                </div>
+                                <h3 className="text-lg font-semibold text-zinc-300 mb-2">No Items for Sale</h3>
+                                <p className="text-zinc-500 text-sm">Approve returned/unclaimed items for sale to see them here.</p>
+                            </div>
+                        ) : (
+                            forSaleItems.map((item, idx) => (
+                                <div
+                                    key={item.id}
+                                    className="card p-5 animate-fade-in flex flex-col"
+                                    style={{ animationDelay: `${idx * 50}ms` }}
+                                >
+                                    <div className="flex items-start gap-4 mb-4">
+                                        <div className="w-16 h-16 rounded-xl overflow-hidden bg-surface-200 flex-shrink-0">
+                                            {item.imageUrl ? (
+                                                <img
+                                                    src={item.imageUrl.startsWith('http') ? item.imageUrl : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${item.imageUrl}`}
+                                                    alt={item.title}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center">
+                                                    <Package className="w-6 h-6 text-zinc-600" />
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <div className="flex justify-between items-start gap-2">
+                                                <h4 className="font-medium text-white line-clamp-1">{item.title}</h4>
+                                                <span className="text-sm font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                                                    ₹{item.price}
+                                                </span>
+                                            </div>
+                                            <p className="text-sm text-zinc-500 line-clamp-2 mt-1">{item.description}</p>
+
+                                            <div className="flex items-center gap-1.5 text-xs text-zinc-600 mt-2">
+                                                <Calendar className="w-3.5 h-3.5" />
+                                                <span>{
+                                                    item.createdAt
+                                                        ? (typeof item.createdAt === 'object' && '_seconds' in (item.createdAt as any))
+                                                            ? new Date((item.createdAt as any)._seconds * 1000).toLocaleDateString()
+                                                            : new Date(item.createdAt as string).toLocaleDateString()
+                                                        : 'N/A'
+                                                }</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {(item as any).saleStatus === 'reserved' && (
+                                        <div className="mb-4 bg-amber-500/10 border border-amber-500/20 rounded-lg p-3 text-xs text-amber-200/80">
+                                            <span className="font-semibold block mb-1">Reserved via Shop</span>
+                                            Buyer ID: {(item as any).reservedBy}
+                                        </div>
+                                    )}
+
+                                    <div className="mt-auto pt-4 border-t border-white/[0.04] flex justify-end">
+                                        <button
+                                            onClick={() => handleMarkSold(item.id)}
+                                            disabled={actionLoading === item.id}
+                                            className="btn flex items-center gap-2 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 px-4 py-2 text-sm"
+                                        >
+                                            {actionLoading === item.id ? (
+                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                            ) : (
+                                                <Check className="w-4 h-4" />
+                                            )}
+                                            Mark Sold
+                                        </button>
                                     </div>
                                 </div>
                             ))

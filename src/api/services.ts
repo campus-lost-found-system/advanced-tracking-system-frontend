@@ -2,14 +2,21 @@ import api from './axios';
 
 export interface Item {
     id: string;
-    title: string;
     type: 'lost' | 'found';
-    location: string;
+    title: string;
     description: string;
-    status: 'pending' | 'returned';
+    date: string;
+    location: string;
+    category?: string;
+    userId: string;
     imageUrl?: string;
-    reportedBy: string;
-    createdAt: string;
+    status: 'active' | 'resolved' | 'returned' | 'for_sale' | 'sold' | 'pending';
+    features?: any;
+    price?: number;
+    saleStatus?: string;
+    reservedBy?: string;
+    createdAt?: string | { _seconds: number };
+    reportedBy?: string;
 }
 
 export interface Claim {
@@ -214,7 +221,19 @@ export const approveSale = async (itemId: string, price: number) => {
     return data;
 };
 
-/** Buyer purchases an item */
+/** Admin marks an item as sold */
+export const markItemSold = async (itemId: string) => {
+    const { data } = await api.post('/api/admin/sale/mark-sold', { itemId });
+    return data;
+};
+
+/** Get items listed for sale (user view) */
+export const getForSaleItems = async () => {
+    const { data } = await api.get('/api/sale/items');
+    return data;
+};
+
+/** Buyer purchases/reserves an item */
 export const buyItem = async (itemId: string) => {
     const { data } = await api.post('/api/sale/buy', { itemId });
     return data;

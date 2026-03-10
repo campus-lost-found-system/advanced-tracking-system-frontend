@@ -27,11 +27,14 @@
     color: #ffffff;
   }
 
-  button, a {
+  button,
+  a {
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  input, textarea, select {
+  input,
+  textarea,
+  select {
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
@@ -56,6 +59,7 @@
 }
 
 @layer components {
+
   /* Glassmorphism */
   .glass {
     background: rgba(18, 18, 26, 0.7);
@@ -250,12 +254,10 @@
     bottom: 0;
     left: 0;
     transform: translateX(-100%);
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.04),
-      transparent
-    );
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.04),
+        transparent);
     animation: shimmer 2s linear infinite;
   }
 
