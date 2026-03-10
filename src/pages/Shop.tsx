@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getForSaleItems, buyItem, Item } from '../api/services';
-import { ShoppingBag, Package, DollarSign, Loader2, Tag, MapPin } from 'lucide-react';
+import { ShoppingBag, Package, IndianRupee, Loader2, Tag, MapPin } from 'lucide-react';
 import Layout from '../components/Layout';
 
 const Shop: React.FC = () => {
@@ -94,8 +94,8 @@ const Shop: React.FC = () => {
 
                                     {/* Price badge */}
                                     <div className="absolute top-3 right-3 flex items-center gap-1 text-sm font-bold text-amber-300 bg-amber-500/15 border border-amber-500/20 px-2.5 py-1 rounded-lg backdrop-blur-md">
-                                        <DollarSign className="w-3.5 h-3.5" />
-                                        <span>₹{(item as any).price}</span>
+                                        <IndianRupee className="w-3.5 h-3.5" />
+                                        <span>{(item as any).price}</span>
                                     </div>
                                 </div>
 
