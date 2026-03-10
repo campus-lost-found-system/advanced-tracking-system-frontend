@@ -28,15 +28,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fakeAdmin = localStorage.getItem('fake_admin');
-        if (fakeAdmin === 'true') {
-            setUser({ email: 'admin@advancedtracking.com', uid: 'admin-uid' } as any);
-            getProfile().then(profileData => {
-                setUserProfile(profileData.data);
-                setLoading(false);
-            }).catch(() => setLoading(false));
-            return;
-        }
+        // Clear any leftover fake_admin flag from local development
+        localStorage.removeItem('fake_admin');
 
         const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
             setUser(firebaseUser);
@@ -59,20 +52,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, []);
 
     const login = async (email: string, password: string): Promise<UserProfile> => {
-        if (email === 'admin@gmail.com' && password === 'admin') {
-            localStorage.setItem('fake_admin', 'true');
-            const fakeProfile: UserProfile = {
-                uid: 'admin-uid',
-                email: 'admin@advancedtracking.com',
-                role: 'admin',
-                displayName: 'Administrator'
-            } as any;
-            setUser({ email: 'admin@advancedtracking.com', uid: 'admin-uid' } as any);
-            setUserProfile(fakeProfile);
-            return fakeProfile;
-        }
         await signInWithEmailAndPassword(auth, email, password);
-        // Fetch profile immediately after login for the returning promise
         const profileData = await getProfile();
         setUserProfile(profileData.data);
         return profileData.data;
