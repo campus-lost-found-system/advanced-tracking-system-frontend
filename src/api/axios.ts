@@ -17,9 +17,16 @@ api.interceptors.request.use(
             return config;
         }
 
-        const user = auth.currentUser;
+        // Wait for Firebase auth to fully initialize before reading user
+        const user = await new Promise((resolve) => {
+            const unsubscribe = auth.onAuthStateChanged((user) => {
+                unsubscribe();
+                resolve(user);
+            });
+        });
+
         if (user) {
-            const token = await user.getIdToken(true);
+            const token = await (user as any).getIdToken(true);
             config.headers.Authorization = `Bearer ${token}`;
         }
         return config;
@@ -34,8 +41,10 @@ api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            // Redirect to login
-            window.location.href = '/login';
+            // Only redirect if not already on login page to prevent infinite loop
+            if (window.location.pathname !== '/login') {
+                window.location.href = '/login';
+            }
         }
         return Promise.reject(error);
     }
