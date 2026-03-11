@@ -118,7 +118,7 @@ const Profile: React.FC = () => {
         return (
             <Layout>
                 <div className="flex items-center justify-center min-h-[60vh]">
-                    <Loader2 className="w-8 h-8 text-accent animate-spin" />
+                    <Loader2 className="w-8 h-8 text-primary animate-spin" />
                 </div>
             </Layout>
         );
@@ -128,7 +128,7 @@ const Profile: React.FC = () => {
         <Layout>
             <div className="max-w-5xl mx-auto space-y-8">
                 {profileError && (
-                    <div className="flex items-center gap-3 bg-red-500/10 border border-red-500/20 text-red-300 px-4 py-3 rounded-xl text-sm">
+                    <div className="flex items-center gap-3 bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-xl text-sm">
                         <AlertCircle className="w-4 h-4 flex-shrink-0" />
                         <span>{profileError}</span>
                     </div>
@@ -140,38 +140,38 @@ const Profile: React.FC = () => {
                         {/* Avatar Card */}
                         <div className="card p-6 text-center" style={{ transform: 'none' }}>
                             <div className="relative inline-block mb-4">
-                                <div className="w-24 h-24 rounded-2xl bg-gradient-accent flex items-center justify-center shadow-glow-md mx-auto">
-                                    <User className="w-12 h-12 text-white" />
+                                <div className="w-24 h-24 rounded-2xl bg-surface-50 border border-surface-100 flex items-center justify-center shadow-sm mx-auto">
+                                    <User className="w-12 h-12 text-primary" />
                                 </div>
-                                <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-lg bg-emerald-500 border-2 border-surface flex items-center justify-center">
-                                    <Check className="w-3 h-3 text-white" />
+                                <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-lg bg-primary border-2 border-surface flex items-center justify-center">
+                                    <Check className="w-3 h-3 text-surface" />
                                 </div>
                             </div>
-                            <h2 className="text-xl font-bold text-white">{profile?.displayName || 'User'}</h2>
-                            <p className="text-sm text-zinc-500 capitalize mt-1">{profile?.role || 'Member'}</p>
+                            <h2 className="text-xl font-bold text-primary">{profile?.displayName || 'User'}</h2>
+                            <p className="text-sm text-text-muted capitalize mt-1">{profile?.role || 'Member'}</p>
                         </div>
 
                         {/* Account Details */}
                         <div className="card p-5 space-y-4" style={{ transform: 'none' }}>
-                            <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest">Account</h3>
+                            <h3 className="text-xs font-semibold text-text-muted uppercase tracking-widest">Account</h3>
                             <div className="space-y-3">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center flex-shrink-0">
-                                        <Mail className="w-4 h-4 text-indigo-400" />
+                                    <div className="w-8 h-8 rounded-lg bg-surface-50 border border-surface-100 flex items-center justify-center flex-shrink-0">
+                                        <Mail className="w-4 h-4 text-primary" />
                                     </div>
-                                    <span className="text-sm text-zinc-300 truncate">{profile?.email}</span>
+                                    <span className="text-sm text-text-secondary truncate">{profile?.email}</span>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-lg bg-violet-500/10 flex items-center justify-center flex-shrink-0">
-                                        <IdCard className="w-4 h-4 text-violet-400" />
+                                    <div className="w-8 h-8 rounded-lg bg-surface-50 border border-surface-100 flex items-center justify-center flex-shrink-0">
+                                        <IdCard className="w-4 h-4 text-primary" />
                                     </div>
-                                    <span className="text-sm text-zinc-300">{profile?.campusId || profile?.uid?.slice(0, 8)}</span>
+                                    <span className="text-sm text-text-secondary">{profile?.campusId || profile?.uid?.slice(0, 8)}</span>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
-                                        <Shield className="w-4 h-4 text-amber-400" />
+                                    <div className="w-8 h-8 rounded-lg bg-surface-50 border border-surface-100 flex items-center justify-center flex-shrink-0">
+                                        <Shield className="w-4 h-4 text-primary" />
                                     </div>
-                                    <span className="text-sm text-zinc-300 capitalize">{profile?.role} Account</span>
+                                    <span className="text-sm text-text-secondary capitalize">{profile?.role} Account</span>
                                 </div>
                             </div>
                         </div>
@@ -180,27 +180,27 @@ const Profile: React.FC = () => {
                     {/* ═══ Main Settings ═══ */}
                     <div className="lg:col-span-2">
                         <form onSubmit={handleUpdate} className="card overflow-hidden" style={{ transform: 'none' }}>
-                            <div className="p-5 border-b border-white/[0.04]">
-                                <h3 className="text-base font-semibold text-white">Personal Information</h3>
-                                <p className="text-xs text-zinc-500 mt-1">Update your public profile</p>
+                            <div className="p-5 border-b border-surface-100">
+                                <h3 className="text-base font-semibold text-primary">Personal Information</h3>
+                                <p className="text-xs text-text-muted mt-1">Update your public profile</p>
                             </div>
 
                             <div className="p-5 space-y-5">
                                 {successMsg && (
-                                    <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 px-4 py-3 rounded-xl text-sm animate-scale-in">
+                                    <div className="bg-surface-50 border border-surface-100 text-primary px-4 py-3 rounded-xl text-sm animate-scale-in">
                                         ✓ {successMsg}
                                     </div>
                                 )}
 
                                 {saveError && (
-                                    <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 text-red-300 px-4 py-3 rounded-xl text-sm">
+                                    <div className="flex items-center gap-2 bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-xl text-sm">
                                         <AlertCircle className="w-4 h-4 flex-shrink-0" />
                                         <span>{saveError}</span>
                                     </div>
                                 )}
 
                                 <div>
-                                    <label className="block text-sm font-medium text-zinc-400 mb-2">Full Name</label>
+                                    <label className="block text-sm font-medium text-text-muted mb-2">Full Name</label>
                                     <input
                                         type="text"
                                         value={formData.displayName}
@@ -211,7 +211,7 @@ const Profile: React.FC = () => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-zinc-400 mb-2">Phone Number<span className="text-zinc-600 ml-1">(Optional)</span></label>
+                                    <label className="block text-sm font-medium text-text-muted mb-2">Phone Number<span className="text-text-muted ml-1">(Optional)</span></label>
                                     <input
                                         type="tel"
                                         value={formData.phoneNumber}
@@ -222,7 +222,7 @@ const Profile: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className="p-5 border-t border-white/[0.04] flex justify-end">
+                            <div className="p-5 border-t border-surface-100 flex justify-end">
                                 <button
                                     type="submit"
                                     disabled={saving}
@@ -242,14 +242,14 @@ const Profile: React.FC = () => {
                 {/* ═══ My Reported Items ═══ */}
                 <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                        <h2 className="text-xl font-bold text-white">My Reported Items</h2>
-                        <span className="badge bg-surface-200 text-zinc-400 border border-white/[0.04]">
+                        <h2 className="text-xl font-bold text-primary">My Reported Items</h2>
+                        <span className="badge bg-surface-50 text-text-muted border border-surface-100">
                             {myItems.length} items
                         </span>
                     </div>
 
                     {itemsError && (
-                        <div className="flex items-center gap-3 bg-red-500/10 border border-red-500/20 text-red-300 px-4 py-3 rounded-xl text-sm">
+                        <div className="flex items-center gap-3 bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-xl text-sm">
                             <AlertCircle className="w-4 h-4 flex-shrink-0" />
                             <span>{itemsError}</span>
                         </div>
@@ -261,10 +261,10 @@ const Profile: React.FC = () => {
                         </div>
                     ) : myItems.length === 0 ? (
                         <div className="card p-12 text-center" style={{ transform: 'none' }}>
-                            <div className="w-14 h-14 rounded-2xl bg-surface-200 flex items-center justify-center mx-auto mb-3">
-                                <Package className="w-7 h-7 text-zinc-600" />
+                            <div className="w-14 h-14 rounded-2xl bg-surface-50 border border-surface-100 flex items-center justify-center mx-auto mb-3">
+                                <Package className="w-7 h-7 text-text-muted" />
                             </div>
-                            <p className="text-zinc-400 text-sm">You haven't reported any items yet.</p>
+                            <p className="text-text-muted text-sm">You haven't reported any items yet.</p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -297,24 +297,24 @@ const Profile: React.FC = () => {
                                         <div className="flex justify-between items-start gap-3">
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2 mb-1.5">
-                                                    <h3 className="text-sm font-semibold text-white truncate">{item.title}</h3>
+                                                    <h3 className="text-sm font-semibold text-primary truncate">{item.title}</h3>
                                                     <span className={`badge text-[10px] ${item.type === 'lost' ? 'badge-lost' : 'badge-found'}`}>{item.type}</span>
                                                     <span className={`badge text-[10px] ${item.status === 'returned' ? 'badge-approved' : 'badge-pending'}`}>{item.status}</span>
                                                 </div>
-                                                <p className="text-xs text-zinc-500 line-clamp-2 mb-1.5">{item.description}</p>
-                                                <div className="flex items-center gap-1 text-[11px] text-zinc-600">
+                                                <p className="text-xs text-text-secondary line-clamp-2 mb-1.5">{item.description}</p>
+                                                <div className="flex items-center gap-1 text-[11px] text-text-muted">
                                                     <MapPin className="w-3 h-3" />
                                                     <span>{item.location}</span>
                                                 </div>
                                             </div>
                                             <div className="flex gap-1.5 flex-shrink-0">
                                                 <button onClick={() => startEditing(item)}
-                                                    className="p-2 rounded-xl text-zinc-500 hover:text-white hover:bg-surface-200 transition-colors" title="Edit">
+                                                    className="p-2 rounded-xl text-text-muted hover:text-primary hover:bg-surface-50 transition-colors" title="Edit">
                                                     <Pencil className="w-3.5 h-3.5" />
                                                 </button>
                                                 <button onClick={() => handleDeleteItem(item.id)}
                                                     disabled={deleteLoading === item.id}
-                                                    className="p-2 rounded-xl text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50" title="Delete">
+                                                    className="p-2 rounded-xl text-text-muted hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50" title="Delete">
                                                     {deleteLoading === item.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
                                                 </button>
                                             </div>

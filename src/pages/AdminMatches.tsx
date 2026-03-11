@@ -4,7 +4,7 @@ import { verifyClaimFull, approveClaim, rejectClaim } from '../api/services';
 import Layout from '../components/Layout';
 import api from '../api/axios';
 import {
-    ArrowLeft, Sparkles, CheckCircle2, XCircle, Loader2, Shield,
+    ArrowLeft, CheckCircle2, XCircle, Loader2, Shield,
     AlertTriangle, Package, MapPin, Check, X, Cpu, Video
 } from 'lucide-react';
 
@@ -131,27 +131,27 @@ const AdminMatches: React.FC = () => {
     };
 
     const getScoreColor = (score: number) => {
-        if (score >= 0.7) return 'from-emerald-500 to-green-600';
-        if (score >= 0.5) return 'from-amber-500 to-yellow-600';
-        return 'from-red-500 to-orange-600';
+        if (score >= 0.7) return 'bg-primary';
+        if (score >= 0.5) return 'bg-text-secondary';
+        return 'bg-text-muted';
     };
 
     const getScoreLabel = (score: number) => {
-        if (score >= 0.7) return { text: 'High Confidence', cls: 'text-emerald-400' };
-        if (score >= 0.5) return { text: 'Medium Confidence', cls: 'text-amber-400' };
-        return { text: 'Low Confidence', cls: 'text-red-400' };
+        if (score >= 0.7) return { text: 'High Confidence', cls: 'text-primary' };
+        if (score >= 0.5) return { text: 'Medium Confidence', cls: 'text-text-secondary' };
+        return { text: 'Low Confidence', cls: 'text-text-muted' };
     };
 
     const getVerdictStyle = (verdict?: string) => {
         switch (verdict) {
             case 'likely_valid':
-                return { bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', text: 'text-emerald-300', label: 'Likely Valid', icon: <CheckCircle2 className="w-5 h-5" /> };
+                return { bg: 'bg-surface-50', border: 'border-surface-100', text: 'text-primary', label: 'Likely Valid', icon: <CheckCircle2 className="w-5 h-5" /> };
             case 'possibly_valid':
-                return { bg: 'bg-amber-500/10', border: 'border-amber-500/20', text: 'text-amber-300', label: 'Possibly Valid', icon: <AlertTriangle className="w-5 h-5" /> };
+                return { bg: 'bg-surface-50', border: 'border-surface-100', text: 'text-text-secondary', label: 'Possibly Valid', icon: <AlertTriangle className="w-5 h-5" /> };
             case 'likely_invalid':
-                return { bg: 'bg-red-500/10', border: 'border-red-500/20', text: 'text-red-300', label: 'Likely Invalid', icon: <XCircle className="w-5 h-5" /> };
+                return { bg: 'bg-surface-50', border: 'border-surface-100', text: 'text-text-muted', label: 'Likely Invalid', icon: <XCircle className="w-5 h-5" /> };
             default:
-                return { bg: 'bg-surface-200', border: 'border-white/[0.06]', text: 'text-zinc-300', label: verdict || 'Unknown', icon: <Shield className="w-5 h-5" /> };
+                return { bg: 'bg-surface-50', border: 'border-surface-100', text: 'text-text-muted', label: verdict || 'Unknown', icon: <Shield className="w-5 h-5" /> };
         }
     };
 
@@ -159,17 +159,17 @@ const AdminMatches: React.FC = () => {
         if (!features) return null;
         return (
             <div>
-                <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-2 font-semibold">{label}</p>
+                <p className="text-[10px] text-text-muted uppercase tracking-widest mb-2 font-semibold">{label}</p>
                 <div className="grid grid-cols-2 gap-2">
                     {features.category && (
-                        <div className="bg-surface rounded-lg border border-white/[0.04] p-2">
-                            <p className="text-[9px] text-zinc-600 uppercase">Category</p>
-                            <p className="text-white text-xs font-medium">{features.category}</p>
+                        <div className="bg-surface-50 rounded-lg border border-surface-100 p-2">
+                            <p className="text-[9px] text-text-muted uppercase">Category</p>
+                            <p className="text-primary text-xs font-medium">{features.category}</p>
                         </div>
                     )}
                     {features.colors && features.colors.length > 0 && (
-                        <div className="bg-surface rounded-lg border border-white/[0.04] p-2">
-                            <p className="text-[9px] text-zinc-600 uppercase">Colors</p>
+                        <div className="bg-surface-50 rounded-lg border border-surface-100 p-2">
+                            <p className="text-[9px] text-text-muted uppercase">Colors</p>
                             <div className="flex flex-wrap gap-1 mt-0.5">
                                 {features.colors.map((c, i) => (
                                     <span key={i} className="text-[10px] badge">{c}</span>
@@ -178,15 +178,15 @@ const AdminMatches: React.FC = () => {
                         </div>
                     )}
                     {features.shape && (
-                        <div className="bg-surface rounded-lg border border-white/[0.04] p-2">
-                            <p className="text-[9px] text-zinc-600 uppercase">Shape</p>
-                            <p className="text-white text-xs font-medium">{features.shape}</p>
+                        <div className="bg-surface-50 rounded-lg border border-surface-100 p-2">
+                            <p className="text-[9px] text-text-muted uppercase">Shape</p>
+                            <p className="text-primary text-xs font-medium">{features.shape}</p>
                         </div>
                     )}
                     {features.texture && (
-                        <div className="bg-surface rounded-lg border border-white/[0.04] p-2">
-                            <p className="text-[9px] text-zinc-600 uppercase">Texture</p>
-                            <p className="text-white text-xs font-medium">{features.texture}</p>
+                        <div className="bg-surface-50 rounded-lg border border-surface-100 p-2">
+                            <p className="text-[9px] text-text-muted uppercase">Texture</p>
+                            <p className="text-primary text-xs font-medium">{features.texture}</p>
                         </div>
                     )}
                 </div>
@@ -203,7 +203,7 @@ const AdminMatches: React.FC = () => {
         <Layout>
             <div className="max-w-5xl mx-auto space-y-6">
                 {/* Back */}
-                <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-zinc-500 hover:text-white text-sm transition-colors">
+                <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-text-muted hover:text-primary text-sm transition-colors">
                     <ArrowLeft className="w-4 h-4" />
                     <span>Back to Dashboard</span>
                 </button>
@@ -216,28 +216,28 @@ const AdminMatches: React.FC = () => {
                     <>
                         {/* ═══ Claim Header: Lost vs Found ═══ */}
                         <div className="card p-6" style={{ transform: 'none' }}>
-                            <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-3">
-                                <Sparkles className="w-5 h-5 text-violet-400" />
+                            <h2 className="text-lg font-bold text-primary mb-4 flex items-center gap-3">
+                                <Shield className="w-5 h-5 text-primary" />
                                 Claim Verification
-                                <span className="text-xs badge bg-surface-200 text-zinc-400 border border-white/[0.04] ml-auto">{claimId?.slice(0, 8)}...</span>
+                                <span className="text-xs badge ml-auto">{claimId?.slice(0, 8)}...</span>
                             </h2>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {/* Found Item */}
-                                <div className="bg-surface rounded-xl border border-emerald-500/15 p-4">
-                                    <p className="text-[10px] text-emerald-400 uppercase tracking-widest mb-3 font-semibold">Found Item</p>
+                                <div className="bg-surface-50 rounded-xl border border-surface-100 p-4">
+                                    <p className="text-[10px] text-text-muted uppercase tracking-widest mb-3 font-semibold">Found Item</p>
                                     <div className="flex items-start gap-3">
-                                        <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-surface-200 flex items-center justify-center">
+                                        <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-surface-50 flex items-center justify-center">
                                             {claim?.item?.imageUrl ? (
                                                 <img src={imgSrc(claim.item.imageUrl)} alt={claim.item?.title} className="w-full h-full object-cover" />
                                             ) : (
-                                                <Package className="w-8 h-8 text-zinc-700" />
+                                                <Package className="w-8 h-8 text-text-muted" />
                                             )}
                                         </div>
                                         <div className="min-w-0">
-                                            <p className="text-sm font-semibold text-white">{claim?.item?.title || '—'}</p>
-                                            <p className="text-xs text-zinc-500 line-clamp-2 mt-1">{claim?.item?.description || ''}</p>
-                                            <div className="flex items-center gap-3 mt-2 text-[11px] text-zinc-600">
+                                            <p className="text-sm font-semibold text-primary">{claim?.item?.title || '—'}</p>
+                                            <p className="text-xs text-text-secondary line-clamp-2 mt-1">{claim?.item?.description || ''}</p>
+                                            <div className="flex items-center gap-3 mt-2 text-[11px] text-text-muted">
                                                 {claim?.item?.location && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{claim.item.location}</span>}
                                             </div>
                                         </div>
@@ -245,27 +245,27 @@ const AdminMatches: React.FC = () => {
                                 </div>
 
                                 {/* Lost Item */}
-                                <div className="bg-surface rounded-xl border border-red-500/15 p-4">
-                                    <p className="text-[10px] text-red-400 uppercase tracking-widest mb-3 font-semibold">Claimant's Lost Item</p>
+                                <div className="bg-surface-50 rounded-xl border border-surface-100 p-4">
+                                    <p className="text-[10px] text-text-muted uppercase tracking-widest mb-3 font-semibold">Claimant's Lost Item</p>
                                     {claim?.lostItem ? (
                                         <div className="flex items-start gap-3">
-                                            <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-surface-200 flex items-center justify-center">
+                                            <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-surface-50 flex items-center justify-center">
                                                 {claim.lostItem.imageUrl ? (
                                                     <img src={imgSrc(claim.lostItem.imageUrl)} alt={claim.lostItem?.title} className="w-full h-full object-cover" />
                                                 ) : (
-                                                    <Package className="w-8 h-8 text-zinc-700" />
+                                                    <Package className="w-8 h-8 text-text-muted" />
                                                 )}
                                             </div>
                                             <div className="min-w-0">
-                                                <p className="text-sm font-semibold text-white">{claim.lostItem?.title || '—'}</p>
-                                                <p className="text-xs text-zinc-500 line-clamp-2 mt-1">{claim.lostItem?.description || ''}</p>
-                                                <div className="flex items-center gap-3 mt-2 text-[11px] text-zinc-600">
+                                                <p className="text-sm font-semibold text-primary">{claim.lostItem?.title || '—'}</p>
+                                                <p className="text-xs text-text-secondary line-clamp-2 mt-1">{claim.lostItem?.description || ''}</p>
+                                                <div className="flex items-center gap-3 mt-2 text-[11px] text-text-muted">
                                                     {claim.lostItem?.location && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{claim.lostItem.location}</span>}
                                                 </div>
                                             </div>
                                         </div>
                                     ) : (
-                                        <p className="text-sm text-zinc-600 italic">No linked lost item</p>
+                                        <p className="text-sm text-text-muted italic">No linked lost item</p>
                                     )}
                                 </div>
                             </div>
@@ -273,27 +273,27 @@ const AdminMatches: React.FC = () => {
                             {/* Report Metadata */}
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
                                 {claim?.zone && (
-                                    <div className="bg-surface rounded-xl border border-white/[0.04] p-3">
-                                        <p className="text-[10px] text-red-400 uppercase tracking-widest mb-1">📍 Location</p>
-                                        <p className="text-white font-medium text-sm">{claim.zone}</p>
+                                    <div className="bg-surface-50 rounded-xl border border-surface-100 p-3">
+                                        <p className="text-[10px] text-text-muted uppercase tracking-widest mb-1">📍 Location</p>
+                                        <p className="text-primary font-medium text-sm">{claim.zone}</p>
                                     </div>
                                 )}
                                 {claim?.dateOfLoss && (
-                                    <div className="bg-surface rounded-xl border border-white/[0.04] p-3">
-                                        <p className="text-[10px] text-blue-400 uppercase tracking-widest mb-1">📅 Date</p>
-                                        <p className="text-white font-medium text-sm">{claim.dateOfLoss}</p>
+                                    <div className="bg-surface-50 rounded-xl border border-surface-100 p-3">
+                                        <p className="text-[10px] text-text-muted uppercase tracking-widest mb-1">📅 Date</p>
+                                        <p className="text-primary font-medium text-sm">{claim.dateOfLoss}</p>
                                     </div>
                                 )}
                                 {claim?.timeOfLoss && (
-                                    <div className="bg-surface rounded-xl border border-white/[0.04] p-3">
-                                        <p className="text-[10px] text-green-400 uppercase tracking-widest mb-1">🕐 Time Window</p>
-                                        <p className="text-white font-medium text-sm">{claim.timeOfLoss}</p>
+                                    <div className="bg-surface-50 rounded-xl border border-surface-100 p-3">
+                                        <p className="text-[10px] text-text-muted uppercase tracking-widest mb-1">🕐 Time Window</p>
+                                        <p className="text-primary font-medium text-sm">{claim.timeOfLoss}</p>
                                     </div>
                                 )}
                                 {claim?.item?.category && (
-                                    <div className="bg-surface rounded-xl border border-white/[0.04] p-3">
-                                        <p className="text-[10px] text-amber-400 uppercase tracking-widest mb-1">📦 Category</p>
-                                        <p className="text-white font-medium text-sm">{claim.item.category}</p>
+                                    <div className="bg-surface-50 rounded-xl border border-surface-100 p-3">
+                                        <p className="text-[10px] text-text-muted uppercase tracking-widest mb-1">📦 Category</p>
+                                        <p className="text-primary font-medium text-sm">{claim.item.category}</p>
                                     </div>
                                 )}
                             </div>
@@ -304,19 +304,19 @@ const AdminMatches: React.FC = () => {
                             <div className="card p-6" style={{ transform: 'none' }}>
                                 <div className="flex justify-between items-center">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500/20 to-indigo-500/20 flex items-center justify-center">
-                                            <Sparkles className="w-5 h-5 text-violet-400" />
+                                        <div className="w-10 h-10 rounded-xl bg-surface-50 border border-surface-100 flex items-center justify-center">
+                                            <Shield className="w-5 h-5 text-primary" />
                                         </div>
                                         <div>
-                                            <h3 className="text-base font-semibold text-white">Run AI + CCTV Verification</h3>
-                                            <p className="text-xs text-zinc-600">Extracts features from both items, compares them, and checks CCTV logs</p>
+                                            <h3 className="text-base font-semibold text-primary">Run AI + CCTV Verification</h3>
+                                            <p className="text-xs text-text-muted">Extracts features from both items, compares them, and checks CCTV logs</p>
                                         </div>
                                     </div>
                                     <button
                                         onClick={handleVerify}
-                                        className="btn-primary text-sm flex items-center gap-2 py-2.5 px-5"
+                                        className="btn-primary flex items-center gap-2 py-2 px-4 text-sm"
                                     >
-                                        <Sparkles className="w-4 h-4" />
+                                        <Shield className="w-4 h-4" />
                                         <span>Verify Now</span>
                                     </button>
                                 </div>
@@ -326,21 +326,21 @@ const AdminMatches: React.FC = () => {
                         {/* Loading */}
                         {verifying && (
                             <div className="card p-6 flex items-center gap-4 animate-scale-in" style={{ transform: 'none' }}>
-                                <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
-                                    <Loader2 className="w-5 h-5 text-accent-light animate-spin" />
+                                <div className="w-10 h-10 rounded-xl bg-surface-50 border border-surface-100 flex items-center justify-center flex-shrink-0">
+                                    <Loader2 className="w-5 h-5 text-primary animate-spin" />
                                 </div>
                                 <div>
-                                    <p className="text-sm font-medium text-indigo-200">Running AI image comparison & CCTV analysis...</p>
-                                    <p className="text-xs text-zinc-600 mt-0.5">This may take 15-30 seconds</p>
+                                    <p className="text-sm font-medium text-primary">Running AI image comparison & CCTV analysis...</p>
+                                    <p className="text-xs text-text-muted mt-0.5">This may take 15-30 seconds</p>
                                 </div>
                             </div>
                         )}
 
                         {/* Error */}
                         {verifyError && (
-                            <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-center gap-3 animate-scale-in">
-                                <XCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
-                                <p className="text-red-300 text-sm">{verifyError}</p>
+                            <div className="bg-red-50 border border-red-100 rounded-xl p-4 flex items-center gap-3 animate-scale-in">
+                                <XCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+                                <p className="text-red-600 text-sm">{verifyError}</p>
                             </div>
                         )}
 
@@ -351,14 +351,14 @@ const AdminMatches: React.FC = () => {
                                 {/* Section 1: AI Image Match */}
                                 <div className="card p-6" style={{ transform: 'none' }}>
                                     <div className="flex items-center gap-3 mb-5">
-                                        <div className="w-9 h-9 rounded-xl bg-violet-500/10 flex items-center justify-center">
-                                            <Cpu className="w-[18px] h-[18px] text-violet-400" />
+                                        <div className="w-9 h-9 rounded-xl bg-surface-50 border border-surface-100 flex items-center justify-center">
+                                            <Cpu className="w-[18px] h-[18px] text-primary" />
                                         </div>
-                                        <h3 className="text-base font-semibold text-white">AI Image Match</h3>
+                                        <h3 className="text-base font-semibold text-primary">AI Image Match</h3>
                                     </div>
 
                                     {verifyResult.aiMatch?.error ? (
-                                        <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-sm text-red-300">
+                                        <div className="bg-red-50 border border-red-100 rounded-xl p-4 text-sm text-red-600">
                                             {verifyResult.aiMatch.error}
                                         </div>
                                     ) : verifyResult.aiMatch ? (
@@ -369,13 +369,13 @@ const AdminMatches: React.FC = () => {
                                                     <span className={`text-sm font-semibold ${getScoreLabel(verifyResult.aiMatch.similarity_score || 0).cls}`}>
                                                         {getScoreLabel(verifyResult.aiMatch.similarity_score || 0).text}
                                                     </span>
-                                                    <span className="text-3xl font-bold text-white">
+                                                    <span className="text-3xl font-bold text-primary">
                                                         {((verifyResult.aiMatch.similarity_score || 0) * 100).toFixed(0)}%
                                                     </span>
                                                 </div>
-                                                <div className="w-full bg-surface-300 rounded-full h-3 overflow-hidden">
+                                                <div className="w-full bg-surface-100 rounded-full h-3 overflow-hidden">
                                                     <div
-                                                        className={`h-full rounded-full bg-gradient-to-r ${getScoreColor(verifyResult.aiMatch.similarity_score || 0)} transition-all duration-1000`}
+                                                        className={`h-full rounded-full ${getScoreColor(verifyResult.aiMatch.similarity_score || 0)} transition-all duration-1000`}
                                                         style={{ width: `${Math.min((verifyResult.aiMatch.similarity_score || 0) * 100, 100)}%` }}
                                                     />
                                                 </div>
@@ -417,16 +417,16 @@ const AdminMatches: React.FC = () => {
                                 {/* Section 2: CCTV Verification */}
                                 <div className="card p-6" style={{ transform: 'none' }}>
                                     <div className="flex items-center gap-3 mb-5">
-                                        <div className="w-9 h-9 rounded-xl bg-indigo-500/10 flex items-center justify-center">
-                                            <Video className="w-[18px] h-[18px] text-indigo-400" />
+                                        <div className="w-9 h-9 rounded-xl bg-surface-50 border border-surface-100 flex items-center justify-center">
+                                            <Video className="w-[18px] h-[18px] text-primary" />
                                         </div>
-                                        <h3 className="text-base font-semibold text-white">CCTV Verification</h3>
+                                        <h3 className="text-base font-semibold text-primary">CCTV Verification</h3>
                                     </div>
 
                                     {verifyResult.cctvVerification?.error ? (
-                                        <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 text-sm text-amber-300">
-                                            <p className="font-medium mb-1">CCTV check unavailable</p>
-                                            <p className="text-xs text-amber-400/70">{verifyResult.cctvVerification.error}</p>
+                                        <div className="bg-surface-50 border border-surface-200 rounded-xl p-4 text-sm text-text-muted">
+                                            <p className="font-medium mb-1 text-primary">CCTV check unavailable</p>
+                                            <p className="text-xs text-text-muted">{verifyResult.cctvVerification.error}</p>
                                         </div>
                                     ) : verifyResult.cctvVerification ? (
                                         <div className="space-y-4">
@@ -439,27 +439,27 @@ const AdminMatches: React.FC = () => {
                                                             <span className={style.text}>{style.icon}</span>
                                                             <div>
                                                                 <p className={`font-semibold ${style.text}`}>{style.label}</p>
-                                                                <p className="text-[11px] text-zinc-600">CCTV AI Verdict</p>
+                                                                <p className="text-[11px] text-text-muted">CCTV AI Verdict</p>
                                                             </div>
                                                         </div>
                                                         <div className="text-right">
-                                                            <span className="text-3xl font-bold text-white">
+                                                            <span className="text-3xl font-bold text-primary">
                                                                 {((verifyResult.cctvVerification.confidence || 0) * 100).toFixed(0)}%
                                                             </span>
-                                                            <p className="text-[11px] text-zinc-600">Confidence</p>
+                                                            <p className="text-[11px] text-text-muted">Confidence</p>
                                                         </div>
                                                     </div>
                                                 );
                                             })()}
 
                                             {/* Confidence Bar */}
-                                            <div className="w-full bg-surface-300 rounded-full h-2.5 overflow-hidden">
+                                            <div className="w-full bg-surface-100 rounded-full h-2.5 overflow-hidden">
                                                 <div
                                                     className={`h-full rounded-full transition-all duration-1000 ${(verifyResult.cctvVerification.confidence || 0) >= 0.7
-                                                        ? 'bg-gradient-to-r from-emerald-500 to-green-500'
+                                                        ? 'bg-primary'
                                                         : (verifyResult.cctvVerification.confidence || 0) >= 0.4
-                                                            ? 'bg-gradient-to-r from-amber-500 to-yellow-500'
-                                                            : 'bg-gradient-to-r from-red-500 to-orange-500'
+                                                            ? 'bg-text-secondary'
+                                                            : 'bg-text-muted'
                                                         }`}
                                                     style={{ width: `${(verifyResult.cctvVerification.confidence || 0) * 100}%` }}
                                                 />
@@ -467,16 +467,16 @@ const AdminMatches: React.FC = () => {
 
                                             {/* Match + Reasoning */}
                                             <div className="flex items-center gap-2 text-sm">
-                                                <span className="text-zinc-500">Match:</span>
-                                                <span className={verifyResult.cctvVerification.match ? 'text-emerald-400 font-medium' : 'text-red-400 font-medium'}>
+                                                <span className="text-text-muted">Match:</span>
+                                                <span className={verifyResult.cctvVerification.match ? 'text-primary font-medium' : 'text-text-secondary font-medium'}>
                                                     {verifyResult.cctvVerification.match ? '✓ Yes' : '✗ No'}
                                                 </span>
                                             </div>
 
                                             {verifyResult.cctvVerification.reasoning && (
-                                                <div className="bg-surface rounded-xl border border-white/[0.04] p-4">
-                                                    <p className="text-[10px] text-zinc-600 uppercase tracking-widest mb-2">AI Reasoning</p>
-                                                    <p className="text-zinc-300 text-sm leading-relaxed">{verifyResult.cctvVerification.reasoning}</p>
+                                                <div className="bg-surface-50 rounded-xl border border-surface-100 p-4">
+                                                    <p className="text-[10px] text-text-muted uppercase tracking-widest mb-2">AI Reasoning</p>
+                                                    <p className="text-text-secondary text-sm leading-relaxed">{verifyResult.cctvVerification.reasoning}</p>
                                                 </div>
                                             )}
                                         </div>
@@ -485,7 +485,7 @@ const AdminMatches: React.FC = () => {
 
                                 {/* ═══ Admin Decision ═══ */}
                                 <div className="card p-6" style={{ transform: 'none' }}>
-                                    <h3 className="text-base font-semibold text-white mb-4">Admin Decision</h3>
+                                    <h3 className="text-base font-semibold text-primary mb-4">Admin Decision</h3>
                                     <div className="flex gap-4">
                                         <button
                                             onClick={handleApprove}

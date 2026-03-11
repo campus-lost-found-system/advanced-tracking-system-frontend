@@ -71,7 +71,7 @@ const ClaimChat: React.FC = () => {
                 {/* Back button */}
                 <button
                     onClick={() => navigate(-1)}
-                    className="flex items-center gap-2 text-zinc-500 hover:text-white mb-4 font-medium text-sm transition-colors"
+                    className="flex items-center gap-2 text-text-muted hover:text-primary mb-4 font-medium text-sm transition-colors"
                 >
                     <ArrowLeft className="w-4 h-4" />
                     <span>Back</span>
@@ -80,26 +80,26 @@ const ClaimChat: React.FC = () => {
                 {/* Chat Container */}
                 <div className="card overflow-hidden" style={{ transform: 'none' }}>
                     {/* Chat Header */}
-                    <div className="p-5 border-b border-white/[0.04] flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
-                            <MessageSquare className="w-5 h-5 text-accent-light" />
+                    <div className="p-5 border-b border-surface-100 flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-xl bg-surface-50 border border-surface-100 flex items-center justify-center">
+                            <MessageSquare className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                            <h2 className="text-base font-semibold text-white">Claim Discussion</h2>
-                            <p className="text-xs text-zinc-500 mt-0.5">
+                            <h2 className="text-base font-semibold text-primary">Claim Discussion</h2>
+                            <p className="text-xs text-text-muted mt-0.5">
                                 Communicate with admin · ID: {claimId?.slice(0, 8)}...
                             </p>
                         </div>
                         <div className="ml-auto flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                            <span className="text-xs text-zinc-500">Live</span>
+                            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                            <span className="text-xs text-text-muted">Live</span>
                         </div>
                     </div>
 
                     {/* Messages Area */}
-                    <div className="h-[440px] overflow-y-auto p-5 space-y-4 bg-surface/50">
+                    <div className="h-[440px] overflow-y-auto p-5 space-y-4 bg-surface-50">
                         {fetchError && (
-                            <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 text-red-300 px-3 py-2 rounded-xl text-sm">
+                            <div className="flex items-center gap-2 bg-red-50 border border-red-100 text-red-600 px-3 py-2 rounded-xl text-sm">
                                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
                                 <span>{fetchError}</span>
                             </div>
@@ -107,14 +107,14 @@ const ClaimChat: React.FC = () => {
                         {loading ? (
                             <div className="flex flex-col items-center justify-center h-full gap-3">
                                 <div className="skeleton w-12 h-12 rounded-2xl" />
-                                <p className="text-zinc-600 text-sm">Loading messages...</p>
+                                <p className="text-text-muted text-sm">Loading messages...</p>
                             </div>
                         ) : messages.length === 0 ? (
                             <div className="flex flex-col items-center justify-center h-full gap-3">
-                                <div className="w-14 h-14 rounded-2xl bg-surface-200 flex items-center justify-center">
-                                    <MessageSquare className="w-7 h-7 text-zinc-600" />
+                                <div className="w-14 h-14 rounded-2xl bg-surface-100 flex items-center justify-center">
+                                    <MessageSquare className="w-7 h-7 text-text-muted" />
                                 </div>
-                                <p className="text-zinc-500 text-sm">No messages yet. Start the conversation!</p>
+                                <p className="text-text-muted text-sm">No messages yet. Start the conversation!</p>
                             </div>
                         ) : (
                             messages.map((message: any, idx: number) => {
@@ -134,10 +134,10 @@ const ClaimChat: React.FC = () => {
                                     >
                                         {/* Avatar */}
                                         <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold flex-shrink-0 ${isOwnMessage
-                                                ? 'bg-gradient-accent text-white'
+                                                ? 'bg-primary text-surface'
                                                 : message.isProofRequest
-                                                    ? 'bg-amber-500/20 text-amber-300'
-                                                    : 'bg-surface-300 text-zinc-400'
+                                                    ? 'bg-surface-200 text-primary'
+                                                    : 'bg-surface-100 text-text-muted'
                                             }`}>
                                             {getInitials(isOwnMessage ? 'You' : message.senderName)}
                                         </div>
@@ -145,22 +145,22 @@ const ClaimChat: React.FC = () => {
                                         {/* Bubble */}
                                         <div className={`max-w-[70%] ${isOwnMessage ? 'text-right' : ''}`}>
                                             {!isOwnMessage && (
-                                                <p className="text-[11px] font-medium text-zinc-500 mb-1 px-1">
+                                                <p className="text-[11px] font-medium text-text-muted mb-1 px-1">
                                                     {message.senderName || (userProfile?.role === 'admin' ? 'User' : 'Admin')}
                                                 </p>
                                             )}
                                             <div className={`px-4 py-3 rounded-2xl text-sm leading-relaxed ${isOwnMessage
-                                                    ? 'bg-gradient-accent text-white rounded-br-md'
+                                                    ? 'bg-primary text-surface rounded-br-md'
                                                     : message.isProofRequest
-                                                        ? 'bg-amber-500/10 text-amber-200 border border-amber-500/20 rounded-bl-md'
-                                                        : 'bg-surface-200 text-zinc-200 rounded-bl-md'
+                                                        ? 'bg-surface-50 text-text-secondary border border-surface-200 rounded-bl-md'
+                                                        : 'bg-surface-100 text-primary rounded-bl-md'
                                                 }`}>
                                                 {message.isProofRequest && (
-                                                    <p className="text-[11px] font-semibold text-amber-400 mb-1">⚠️ Proof Request</p>
+                                                    <p className="text-[11px] font-semibold text-primary mb-1">Proof Request</p>
                                                 )}
                                                 <p>{message.content}</p>
                                             </div>
-                                            <p className={`text-[10px] mt-1.5 px-1 ${isOwnMessage ? 'text-zinc-600' : 'text-zinc-600'}`}>
+                                            <p className={`text-[10px] mt-1.5 px-1 text-text-muted`}>
                                                 {timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                             </p>
                                         </div>
@@ -172,7 +172,7 @@ const ClaimChat: React.FC = () => {
                     </div>
 
                     {/* Input Area */}
-                    <form onSubmit={handleSend} className="p-4 border-t border-white/[0.04] bg-surface-50/50">
+                    <form onSubmit={handleSend} className="p-4 border-t border-surface-100 bg-surface-50">
                         <div className="flex gap-3">
                             <input
                                 type="text"

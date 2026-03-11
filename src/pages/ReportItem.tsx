@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createItem, uploadItemImage, extractFeatures, compareAndSuggest } from '../api/services';
-import { Loader2, MapPin, FileText, Tag, Image as ImageIcon, Sparkles } from 'lucide-react';
+import { Loader2, MapPin, FileText, Tag, Upload } from 'lucide-react';
 import Layout from '../components/Layout';
 
 const ReportItem: React.FC = () => {
@@ -81,8 +81,8 @@ const ReportItem: React.FC = () => {
                     {/* ═══ Item Type Toggle ═══ */}
                     <div className="card p-6" style={{ transform: 'none' }}>
                         <div className="flex items-center gap-3 mb-4">
-                            <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-sm font-bold text-indigo-400">1</div>
-                            <h3 className="text-base font-semibold text-white">Item Type</h3>
+                            <div className="w-8 h-8 rounded-lg bg-surface-50 border border-surface-100 flex items-center justify-center text-sm font-bold text-primary">1</div>
+                            <h3 className="text-base font-semibold text-primary">Item Type</h3>
                         </div>
                         <div className="flex gap-3">
                             {(['lost', 'found'] as const).map((type) => (
@@ -91,13 +91,11 @@ const ReportItem: React.FC = () => {
                                     type="button"
                                     onClick={() => setFormData({ ...formData, type })}
                                     className={`flex-1 py-3 rounded-xl text-sm font-semibold capitalize transition-all ${formData.type === type
-                                        ? type === 'lost'
-                                            ? 'bg-red-500/10 text-red-300 border border-red-500/25 shadow-[0_0_15px_rgba(239,68,68,0.1)]'
-                                            : 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/25 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
-                                        : 'bg-surface-100 text-zinc-500 border border-white/[0.04] hover:bg-surface-200'
+                                        ? 'bg-primary text-surface border border-primary shadow-[0_2px_10px_rgba(0,0,0,0.08)]'
+                                        : 'bg-surface-50 text-text-secondary border border-surface-100 hover:bg-surface-100'
                                         }`}
                                 >
-                                    {type === 'lost' ? '🔴 Lost Item' : '🟢 Found Item'}
+                                    {type === 'lost' ? 'Lost Item' : 'Found Item'}
                                 </button>
                             ))}
                         </div>
@@ -106,13 +104,13 @@ const ReportItem: React.FC = () => {
                     {/* ═══ Details ═══ */}
                     <div className="card p-6" style={{ transform: 'none' }}>
                         <div className="flex items-center gap-3 mb-5">
-                            <div className="w-8 h-8 rounded-lg bg-violet-500/10 flex items-center justify-center text-sm font-bold text-violet-400">2</div>
-                            <h3 className="text-base font-semibold text-white">Item Details</h3>
+                            <div className="w-8 h-8 rounded-lg bg-surface-50 border border-surface-100 flex items-center justify-center text-sm font-bold text-primary">2</div>
+                            <h3 className="text-base font-semibold text-primary">Item Details</h3>
                         </div>
 
                         <div className="space-y-4">
                             <div>
-                                <label htmlFor="title" className="flex items-center gap-2 text-sm font-medium text-zinc-400 mb-2">
+                                <label htmlFor="title" className="flex items-center gap-2 text-sm font-medium text-text-muted mb-2">
                                     <Tag className="w-3.5 h-3.5" /> Title
                                 </label>
                                 <input
@@ -127,7 +125,7 @@ const ReportItem: React.FC = () => {
                             </div>
 
                             <div>
-                                <label htmlFor="location" className="flex items-center gap-2 text-sm font-medium text-zinc-400 mb-2">
+                                <label htmlFor="location" className="flex items-center gap-2 text-sm font-medium text-text-muted mb-2">
                                     <MapPin className="w-3.5 h-3.5" /> Location
                                 </label>
                                 <input
@@ -142,7 +140,7 @@ const ReportItem: React.FC = () => {
                             </div>
 
                             <div>
-                                <label htmlFor="description" className="flex items-center gap-2 text-sm font-medium text-zinc-400 mb-2">
+                                <label htmlFor="description" className="flex items-center gap-2 text-sm font-medium text-text-muted mb-2">
                                     <FileText className="w-3.5 h-3.5" /> Description
                                 </label>
                                 <textarea
@@ -161,17 +159,17 @@ const ReportItem: React.FC = () => {
                     {/* ═══ Image Upload ═══ */}
                     <div className="card p-6" style={{ transform: 'none' }}>
                         <div className="flex items-center gap-3 mb-5">
-                            <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center text-sm font-bold text-amber-400">3</div>
-                            <h3 className="text-base font-semibold text-white">Photo</h3>
-                            <span className="text-xs text-zinc-600 ml-auto">(Optional)</span>
+                            <div className="w-8 h-8 rounded-lg bg-surface-50 border border-surface-100 flex items-center justify-center text-sm font-bold text-primary">3</div>
+                            <h3 className="text-base font-semibold text-primary">Photo</h3>
+                            <span className="text-xs text-text-muted ml-auto">(Optional)</span>
                         </div>
 
                         <div
                             onDragOver={(e) => e.preventDefault()}
                             onDrop={handleDrop}
                             className={`relative border-2 border-dashed rounded-2xl transition-all ${image
-                                ? 'border-accent/30 bg-accent/[0.03]'
-                                : 'border-white/[0.06] hover:border-accent/20 bg-surface-50/30'
+                                ? 'border-primary/30 bg-surface-50'
+                                : 'border-surface-200 hover:border-surface-300 bg-surface-50/50'
                                 }`}
                         >
                             {image ? (
@@ -181,7 +179,7 @@ const ReportItem: React.FC = () => {
                                         <button
                                             type="button"
                                             onClick={() => setImage('')}
-                                            className="text-sm text-red-400 hover:text-red-300 font-medium transition-colors"
+                                            className="text-sm text-red-600 hover:text-red-700 font-medium transition-colors"
                                         >
                                             Remove Image
                                         </button>
@@ -189,11 +187,11 @@ const ReportItem: React.FC = () => {
                                 </div>
                             ) : (
                                 <label className="cursor-pointer flex flex-col items-center justify-center py-10 px-6">
-                                    <div className="w-14 h-14 rounded-2xl bg-surface-200 flex items-center justify-center mb-3">
-                                        <ImageIcon className="w-6 h-6 text-zinc-500" />
+                                    <div className="w-14 h-14 rounded-2xl bg-surface-50 flex items-center justify-center mb-3">
+                                        <Upload className="w-6 h-6 text-text-muted" />
                                     </div>
-                                    <p className="text-sm font-medium text-zinc-300">Drop an image here or click to upload</p>
-                                    <p className="text-xs text-zinc-600 mt-1">PNG, JPG up to 10MB</p>
+                                    <p className="text-sm font-medium text-primary">Drop an image here or click to upload</p>
+                                    <p className="text-xs text-text-muted mt-1">PNG, JPG up to 10MB</p>
                                     <input
                                         type="file"
                                         accept="image/*"
@@ -208,12 +206,12 @@ const ReportItem: React.FC = () => {
                     {/* ═══ AI Status ═══ */}
                     {aiProcessing && (
                         <div className="card p-5 flex items-center gap-4 animate-scale-in" style={{ transform: 'none' }}>
-                            <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center flex-shrink-0">
-                                <Sparkles className="w-5 h-5 text-indigo-400 animate-pulse" />
+                            <div className="w-10 h-10 rounded-xl bg-surface-50 border border-surface-100 flex items-center justify-center flex-shrink-0">
+                                <Loader2 className="w-5 h-5 text-primary animate-spin" />
                             </div>
                             <div>
-                                <p className="text-sm font-medium text-indigo-300">{aiStatusMessage}</p>
-                                <p className="text-xs text-zinc-600 mt-0.5">AI is processing your item image</p>
+                                <p className="text-sm font-medium text-primary">{aiStatusMessage}</p>
+                                <p className="text-xs text-text-muted mt-0.5">AI is processing your item image</p>
                             </div>
                         </div>
                     )}

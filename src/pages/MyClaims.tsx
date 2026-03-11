@@ -41,9 +41,9 @@ const MyClaims: React.FC = () => {
 
     const getStatusBorder = (status: string) => {
         switch (status) {
-            case 'approved': return 'border-l-emerald-500/50';
-            case 'rejected': return 'border-l-red-500/50';
-            default: return 'border-l-amber-500/50';
+            case 'approved': return 'border-l-primary';
+            case 'rejected': return 'border-l-text-muted';
+            default: return 'border-l-surface-200';
         }
     };
 
@@ -53,37 +53,37 @@ const MyClaims: React.FC = () => {
                 {/* Header Stats */}
                 <div className="grid grid-cols-3 gap-4">
                     <div className="stat-card flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center">
-                            <Package className="w-5 h-5 text-indigo-400" />
+                        <div className="w-10 h-10 rounded-xl bg-surface-50 border border-surface-100 flex items-center justify-center">
+                            <Package className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                            <p className="text-xl font-bold text-white">{claims.length}</p>
-                            <p className="text-[11px] text-zinc-500 font-medium">Total</p>
+                            <p className="text-xl font-bold text-primary">{claims.length}</p>
+                            <p className="text-[11px] text-text-muted font-medium">Total</p>
                         </div>
                     </div>
                     <div className="stat-card flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
-                            <Clock className="w-5 h-5 text-amber-400" />
+                        <div className="w-10 h-10 rounded-xl bg-surface-50 border border-surface-100 flex items-center justify-center">
+                            <Clock className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                            <p className="text-xl font-bold text-amber-300">{claims.filter(c => c.status === 'pending').length}</p>
-                            <p className="text-[11px] text-zinc-500 font-medium">Pending</p>
+                            <p className="text-xl font-bold text-primary">{claims.filter(c => c.status === 'pending').length}</p>
+                            <p className="text-[11px] text-text-muted font-medium">Pending</p>
                         </div>
                     </div>
                     <div className="stat-card flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                            <Package className="w-5 h-5 text-emerald-400" />
+                        <div className="w-10 h-10 rounded-xl bg-surface-50 border border-surface-100 flex items-center justify-center">
+                            <Package className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                            <p className="text-xl font-bold text-emerald-300">{claims.filter(c => c.status === 'approved').length}</p>
-                            <p className="text-[11px] text-zinc-500 font-medium">Approved</p>
+                            <p className="text-xl font-bold text-primary">{claims.filter(c => c.status === 'approved').length}</p>
+                            <p className="text-[11px] text-text-muted font-medium">Approved</p>
                         </div>
                     </div>
                 </div>
 
                 {/* Error */}
                 {error && (
-                    <div className="flex items-center gap-3 bg-red-500/10 border border-red-500/20 text-red-300 px-4 py-3 rounded-xl text-sm">
+                    <div className="flex items-center gap-3 bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-xl text-sm">
                         <AlertCircle className="w-4 h-4 flex-shrink-0" />
                         <span>{error}</span>
                     </div>
@@ -98,11 +98,11 @@ const MyClaims: React.FC = () => {
                     </div>
                 ) : claims.length === 0 ? (
                     <div className="card p-16 text-center" style={{ transform: 'none' }}>
-                        <div className="w-16 h-16 rounded-2xl bg-surface-200 flex items-center justify-center mx-auto mb-4">
-                            <Package className="w-8 h-8 text-zinc-600" />
+                        <div className="w-16 h-16 rounded-2xl bg-surface-50 border border-surface-100 flex items-center justify-center mx-auto mb-4">
+                            <Package className="w-8 h-8 text-text-muted" />
                         </div>
-                        <h3 className="text-lg font-semibold text-zinc-300 mb-2">No claims yet</h3>
-                        <p className="text-zinc-500 text-sm mb-6">Browse items and submit your first claim</p>
+                        <h3 className="text-lg font-semibold text-primary mb-2">No claims yet</h3>
+                        <p className="text-text-muted text-sm mb-6">Browse items and submit your first claim</p>
                         <button
                             onClick={() => navigate('/')}
                             className="btn-primary inline-flex items-center gap-2"
@@ -122,7 +122,7 @@ const MyClaims: React.FC = () => {
                                 <div className="flex justify-between items-start gap-4">
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-3 mb-2">
-                                            <h3 className="text-base font-semibold text-white truncate">
+                                            <h3 className="text-base font-semibold text-primary truncate">
                                                 {claim.item?.title || 'Item'}
                                             </h3>
                                             <span className={`badge ${getStatusBadge(claim.status)}`}>
@@ -130,11 +130,11 @@ const MyClaims: React.FC = () => {
                                             </span>
                                         </div>
                                         {claim.item?.description && (
-                                            <p className="text-sm text-zinc-500 line-clamp-2 leading-relaxed mb-3">
+                                            <p className="text-sm text-text-secondary line-clamp-2 leading-relaxed mb-3">
                                                 {claim.item.description}
                                             </p>
                                         )}
-                                        <div className="flex items-center gap-4 text-xs text-zinc-600">
+                                        <div className="flex items-center gap-4 text-xs text-text-muted">
                                             <div className="flex items-center gap-1.5">
                                                 <Calendar className="w-3.5 h-3.5" />
                                                 <span>{

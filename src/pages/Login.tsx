@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Sparkles, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Package, Eye, EyeOff, Loader2 } from 'lucide-react';
 
 const Login: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -40,41 +40,41 @@ const Login: React.FC = () => {
         <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden bg-surface">
             {/* Animated background gradients */}
             <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute -top-[40%] -left-[20%] w-[60%] h-[60%] rounded-full bg-indigo-600/[0.07] blur-[120px] animate-float" />
-                <div className="absolute -bottom-[30%] -right-[20%] w-[50%] h-[50%] rounded-full bg-violet-600/[0.07] blur-[120px] animate-float" style={{ animationDelay: '3s' }} />
-                <div className="absolute top-[20%] right-[10%] w-[30%] h-[30%] rounded-full bg-purple-600/[0.05] blur-[100px] animate-float" style={{ animationDelay: '1.5s' }} />
+                <div className="absolute -top-[40%] -left-[20%] w-[60%] h-[60%] rounded-full bg-surface-200/[0.4] blur-[120px] animate-float" />
+                <div className="absolute -bottom-[30%] -right-[20%] w-[50%] h-[50%] rounded-full bg-surface-200/[0.4] blur-[120px] animate-float" style={{ animationDelay: '3s' }} />
+                <div className="absolute top-[20%] right-[10%] w-[30%] h-[30%] rounded-full bg-surface-100/[0.4] blur-[100px] animate-float" style={{ animationDelay: '1.5s' }} />
             </div>
 
             {/* Grid pattern overlay */}
-            <div className="absolute inset-0 opacity-[0.02]" style={{
-                backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
+            <div className="absolute inset-0 opacity-[0.4]" style={{
+                backgroundImage: `linear-gradient(var(--color-surface-100) 1px, transparent 1px), linear-gradient(90deg, var(--color-surface-100) 1px, transparent 1px)`,
                 backgroundSize: '60px 60px',
             }} />
 
             {/* Login Card */}
             <div className="relative z-10 w-full max-w-[420px] animate-fade-in">
-                <div className="glass-strong rounded-2xl p-8 shadow-glow-sm">
+                <div className="bg-surface border border-surface-200 rounded-2xl p-8 shadow-sm">
                     {/* Logo */}
                     <div className="text-center mb-8">
-                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-accent shadow-glow-md mb-5 animate-pulse-glow">
-                            <Sparkles className="w-8 h-8 text-white" />
+                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-surface-50 border border-surface-100 shadow-sm mb-5">
+                            <Package className="w-8 h-8 text-primary" />
                         </div>
-                        <h1 className="text-3xl font-bold text-white tracking-tight">
+                        <h1 className="text-3xl font-bold text-primary tracking-tight">
                             Lost & Found
                         </h1>
-                        <p className="text-zinc-500 mt-2 text-sm">Welcome back. Sign in to continue.</p>
+                        <p className="text-text-muted mt-2 text-sm">Welcome back. Sign in to continue.</p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-5">
                         {error && (
-                            <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 text-red-300 px-4 py-3 rounded-xl text-sm animate-scale-in">
-                                <div className="w-1.5 h-1.5 rounded-full bg-red-400 flex-shrink-0" />
+                            <div className="flex items-center gap-2 bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-xl text-sm animate-scale-in">
+                                <div className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0" />
                                 {error}
                             </div>
                         )}
 
                         <div className="space-y-2">
-                            <label htmlFor="email" className="block text-sm font-medium text-zinc-300">
+                            <label htmlFor="email" className="block text-sm font-medium text-primary">
                                 Email Address
                             </label>
                             <input
@@ -90,7 +90,7 @@ const Login: React.FC = () => {
                         </div>
 
                         <div className="space-y-2">
-                            <label htmlFor="password" className="block text-sm font-medium text-zinc-300">
+                            <label htmlFor="password" className="block text-sm font-medium text-primary">
                                 Password
                             </label>
                             <div className="relative">
@@ -107,7 +107,7 @@ const Login: React.FC = () => {
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-primary transition-colors"
                                 >
                                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                 </button>
@@ -132,7 +132,7 @@ const Login: React.FC = () => {
                 </div>
 
                 {/* Bottom tag */}
-                <p className="text-center text-zinc-600 text-xs mt-6">
+                <p className="text-center text-text-muted text-xs mt-6">
                     Advanced Tracking System · Secure Login
                 </p>
             </div>

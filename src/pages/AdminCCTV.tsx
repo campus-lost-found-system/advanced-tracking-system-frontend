@@ -75,13 +75,13 @@ const AdminCCTV: React.FC = () => {
     const getVerdictStyle = (verdict?: string) => {
         switch (verdict) {
             case 'likely_valid':
-                return { bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', text: 'text-emerald-300', label: 'Likely Valid', icon: <CheckCircle2 className="w-5 h-5" /> };
+                return { bg: 'bg-surface-50', border: 'border-surface-100', text: 'text-primary', label: 'Likely Valid', icon: <CheckCircle2 className="w-5 h-5" /> };
             case 'possibly_valid':
-                return { bg: 'bg-amber-500/10', border: 'border-amber-500/20', text: 'text-amber-300', label: 'Possibly Valid', icon: <AlertTriangle className="w-5 h-5" /> };
+                return { bg: 'bg-surface-50', border: 'border-surface-100', text: 'text-text-secondary', label: 'Possibly Valid', icon: <AlertTriangle className="w-5 h-5" /> };
             case 'likely_invalid':
-                return { bg: 'bg-red-500/10', border: 'border-red-500/20', text: 'text-red-300', label: 'Likely Invalid', icon: <XCircle className="w-5 h-5" /> };
+                return { bg: 'bg-surface-50', border: 'border-surface-100', text: 'text-text-muted', label: 'Likely Invalid', icon: <XCircle className="w-5 h-5" /> };
             default:
-                return { bg: 'bg-surface-200', border: 'border-white/[0.06]', text: 'text-zinc-300', label: verdict || 'Unknown', icon: <Shield className="w-5 h-5" /> };
+                return { bg: 'bg-surface-50', border: 'border-surface-100', text: 'text-text-muted', label: verdict || 'Unknown', icon: <Shield className="w-5 h-5" /> };
         }
     };
 
@@ -95,21 +95,21 @@ const AdminCCTV: React.FC = () => {
                         <span className={style.text}>{style.icon}</span>
                         <div>
                             <p className={`font-semibold ${style.text}`}>{style.label}</p>
-                            <p className="text-[11px] text-zinc-600">AI Verdict</p>
+                            <p className="text-[11px] text-text-muted">AI Verdict</p>
                         </div>
                     </div>
                     <div className="text-right">
-                        <span className="text-3xl font-bold text-white">{((result.confidence || 0) * 100).toFixed(0)}%</span>
-                        <p className="text-[11px] text-zinc-600">Confidence</p>
+                        <span className="text-3xl font-bold text-primary">{((result.confidence || 0) * 100).toFixed(0)}%</span>
+                        <p className="text-[11px] text-text-muted">Confidence</p>
                     </div>
                 </div>
 
                 {/* Confidence Bar */}
-                <div className="w-full bg-surface-300 rounded-full h-2.5 overflow-hidden">
+                <div className="w-full bg-surface-100 rounded-full h-2.5 overflow-hidden">
                     <div
-                        className={`h-full rounded-full transition-all duration-1000 ${result.confidence && result.confidence >= 0.7 ? 'bg-gradient-to-r from-emerald-500 to-green-500' :
-                                result.confidence && result.confidence >= 0.4 ? 'bg-gradient-to-r from-amber-500 to-yellow-500' :
-                                    'bg-gradient-to-r from-red-500 to-orange-500'
+                        className={`h-full rounded-full transition-all duration-1000 ${result.confidence && result.confidence >= 0.7 ? 'bg-primary' :
+                                result.confidence && result.confidence >= 0.4 ? 'bg-text-secondary' :
+                                    'bg-text-muted'
                             }`}
                         style={{ width: `${(result.confidence || 0) * 100}%` }}
                     />
@@ -117,17 +117,17 @@ const AdminCCTV: React.FC = () => {
 
                 {/* Match Flag */}
                 <div className="flex items-center gap-2 text-sm">
-                    <span className="text-zinc-500">Match:</span>
-                    <span className={result.match ? 'text-emerald-400 font-medium' : 'text-red-400 font-medium'}>
+                    <span className="text-text-secondary">Match:</span>
+                    <span className={result.match ? 'text-primary font-medium' : 'text-text-secondary font-medium'}>
                         {result.match ? '✓ Yes' : '✗ No'}
                     </span>
                 </div>
 
                 {/* Reasoning */}
                 {result.reasoning && (
-                    <div className="bg-surface rounded-xl border border-white/[0.04] p-4">
-                        <p className="text-[10px] text-zinc-600 uppercase tracking-widest mb-2">AI Reasoning</p>
-                        <p className="text-zinc-300 text-sm leading-relaxed">{result.reasoning}</p>
+                    <div className="bg-surface-50 rounded-xl border border-surface-100 p-4">
+                        <p className="text-[10px] text-text-muted uppercase tracking-widest mb-2">AI Reasoning</p>
+                        <p className="text-text-secondary text-sm leading-relaxed">{result.reasoning}</p>
                     </div>
                 )}
             </div>
@@ -138,38 +138,38 @@ const AdminCCTV: React.FC = () => {
         <Layout>
             <div className="max-w-4xl mx-auto space-y-6">
                 {/* Back */}
-                <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-zinc-500 hover:text-white text-sm transition-colors">
+                <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-text-muted hover:text-primary text-sm transition-colors">
                     <ArrowLeft className="w-4 h-4" />
                     <span>Back</span>
                 </button>
 
                 {/* Claim info */}
-                <div className="text-sm text-zinc-500">
-                    Claim: <code className="text-zinc-300 bg-surface-200 px-2 py-0.5 rounded-lg text-xs">{claimId}</code>
+                <div className="text-sm text-text-secondary">
+                    Claim: <code className="text-primary bg-surface-50 border border-surface-100 px-2 py-0.5 rounded-lg text-xs">{claimId}</code>
                 </div>
 
                 {/* ═══ Seed CCTV Logs ═══ */}
                 <div className="card p-6" style={{ transform: 'none' }}>
                     <div className="flex justify-between items-center">
                         <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-xl bg-blue-500/10 flex items-center justify-center">
-                                <Database className="w-[18px] h-[18px] text-blue-400" />
+                            <div className="w-9 h-9 rounded-xl bg-surface-50 border border-surface-100 flex items-center justify-center">
+                                <Database className="w-[18px] h-[18px] text-primary" />
                             </div>
                             <div>
-                                <h2 className="text-base font-semibold text-white">Seed CCTV Logs</h2>
-                                <p className="text-xs text-zinc-600">Populate with 7 days of synthetic data</p>
+                                <h2 className="text-base font-semibold text-primary">Seed CCTV Logs</h2>
+                                <p className="text-xs text-text-muted">Populate with 7 days of synthetic data</p>
                             </div>
                         </div>
                         <button onClick={handleSeedLogs} disabled={seedLoading}
-                            className="btn-secondary text-xs flex items-center gap-2 py-2.5 !border-blue-500/20 !text-blue-300 hover:!bg-blue-500/10">
+                            className="btn-secondary text-xs flex items-center gap-2 py-2.5 hover:bg-surface-50">
                             {seedLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Database className="w-3.5 h-3.5" />}
                             <span>{seedLoading ? 'Seeding...' : 'Seed Now'}</span>
                         </button>
                     </div>
                     {seedResult && (
                         <div className={`mt-4 rounded-xl px-4 py-3 text-sm border ${seedResult.startsWith('Error')
-                                ? 'bg-red-500/10 border-red-500/20 text-red-300'
-                                : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300'
+                                ? 'bg-red-50 border-red-100 text-red-600'
+                                : 'bg-surface-50 border-surface-200 text-primary'
                             }`}>
                             {seedResult}
                         </div>
@@ -180,12 +180,12 @@ const AdminCCTV: React.FC = () => {
                 <div className="card p-6" style={{ transform: 'none' }}>
                     <div className="flex justify-between items-center">
                         <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-xl bg-indigo-500/10 flex items-center justify-center">
-                                <Play className="w-[18px] h-[18px] text-indigo-400" />
+                            <div className="w-9 h-9 rounded-xl bg-surface-50 border border-surface-100 flex items-center justify-center">
+                                <Play className="w-[18px] h-[18px] text-primary" />
                             </div>
                             <div>
-                                <h2 className="text-base font-semibold text-white">Run Verification</h2>
-                                <p className="text-xs text-zinc-600">CCTV logs + visual match + Groq AI verdict</p>
+                                <h2 className="text-base font-semibold text-primary">Run Verification</h2>
+                                <p className="text-xs text-text-muted">CCTV logs + visual match + Groq AI verdict</p>
                             </div>
                         </div>
                         <button onClick={handleVerifyClaim} disabled={verifyLoading}
@@ -196,19 +196,19 @@ const AdminCCTV: React.FC = () => {
                     </div>
 
                     {verifyLoading && (
-                        <div className="mt-4 bg-indigo-500/5 border border-indigo-500/15 rounded-xl p-4 flex items-center gap-3 animate-scale-in">
-                            <Loader2 className="w-5 h-5 text-indigo-400 animate-spin flex-shrink-0" />
+                        <div className="mt-4 bg-surface-50 border border-surface-100 rounded-xl p-4 flex items-center gap-3 animate-scale-in">
+                            <Loader2 className="w-5 h-5 text-primary animate-spin flex-shrink-0" />
                             <div>
-                                <p className="text-sm text-indigo-200">Analyzing CCTV logs and running visual comparison...</p>
-                                <p className="text-[11px] text-zinc-600 mt-0.5">This may take 15-30 seconds</p>
+                                <p className="text-sm text-primary">Analyzing CCTV logs and running visual comparison...</p>
+                                <p className="text-[11px] text-text-muted mt-0.5">This may take 15-30 seconds</p>
                             </div>
                         </div>
                     )}
 
                     {verifyError && (
-                        <div className="mt-4 bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-center gap-3">
-                            <XCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
-                            <p className="text-red-300 text-sm">{verifyError}</p>
+                        <div className="mt-4 bg-red-50 border border-red-100 rounded-xl p-4 flex items-center gap-3">
+                            <XCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+                            <p className="text-red-600 text-sm">{verifyError}</p>
                         </div>
                     )}
 
@@ -218,29 +218,29 @@ const AdminCCTV: React.FC = () => {
                 {/* ═══ Saved Result ═══ */}
                 <div className="card p-6" style={{ transform: 'none' }}>
                     <div className="flex items-center gap-3 mb-1">
-                        <div className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                            <FileSearch className="w-[18px] h-[18px] text-emerald-400" />
+                        <div className="w-9 h-9 rounded-xl bg-surface-50 border border-surface-100 flex items-center justify-center">
+                            <FileSearch className="w-[18px] h-[18px] text-primary" />
                         </div>
                         <div>
-                            <h2 className="text-base font-semibold text-white">Saved Result</h2>
-                            <p className="text-xs text-zinc-600">Previously stored verification</p>
+                            <h2 className="text-base font-semibold text-primary">Saved Result</h2>
+                            <p className="text-xs text-text-muted">Previously stored verification</p>
                         </div>
                     </div>
 
                     {savedLoading ? (
                         <div className="flex items-center gap-3 p-4 mt-4">
-                            <Loader2 className="w-4 h-4 text-zinc-500 animate-spin" />
-                            <span className="text-zinc-600 text-sm">Loading...</span>
+                            <Loader2 className="w-4 h-4 text-text-muted animate-spin" />
+                            <span className="text-text-secondary text-sm">Loading...</span>
                         </div>
                     ) : savedError ? (
-                        <div className="mt-4 bg-surface rounded-xl border border-white/[0.04] p-4 text-center">
-                            <p className="text-zinc-600 text-sm">{savedError}</p>
+                        <div className="mt-4 bg-surface-50 rounded-xl border border-surface-100 p-4 text-center">
+                            <p className="text-text-secondary text-sm">{savedError}</p>
                         </div>
                     ) : savedResult ? (
                         renderVerdict(savedResult)
                     ) : (
-                        <div className="mt-4 bg-surface rounded-xl border border-white/[0.04] p-4 text-center">
-                            <p className="text-zinc-600 text-sm">No saved result</p>
+                        <div className="mt-4 bg-surface-50 rounded-xl border border-surface-100 p-4 text-center">
+                            <p className="text-text-secondary text-sm">No saved result</p>
                         </div>
                     )}
                 </div>

@@ -46,14 +46,14 @@ const Shop: React.FC = () => {
             <div className="max-w-7xl mx-auto space-y-6">
                 {/* Header */}
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
-                        <ShoppingBag className="w-5 h-5 text-amber-400" />
+                    <div className="w-10 h-10 rounded-xl bg-surface-50 border border-surface-100 flex items-center justify-center">
+                        <ShoppingBag className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                        <h1 className="text-xl font-bold text-white">Shop</h1>
-                        <p className="text-xs text-zinc-500">Unclaimed items available for purchase</p>
+                        <h1 className="text-xl font-bold text-primary">Shop</h1>
+                        <p className="text-xs text-text-muted">Unclaimed items available for purchase</p>
                     </div>
-                    <div className="ml-auto badge bg-surface-200 text-zinc-300 border border-white/[0.06]">
+                    <div className="ml-auto badge bg-surface-50 text-text-secondary border border-surface-100">
                         {items.length} Items
                     </div>
                 </div>
@@ -65,11 +65,11 @@ const Shop: React.FC = () => {
                     </div>
                 ) : items.length === 0 ? (
                     <div className="card p-16 text-center" style={{ transform: 'none' }}>
-                        <div className="w-16 h-16 rounded-2xl bg-surface-200 flex items-center justify-center mx-auto mb-4">
-                            <ShoppingBag className="w-8 h-8 text-zinc-600" />
+                        <div className="w-16 h-16 rounded-2xl bg-surface-50 border border-surface-100 flex items-center justify-center mx-auto mb-4">
+                            <ShoppingBag className="w-8 h-8 text-text-muted" />
                         </div>
-                        <h3 className="text-lg font-semibold text-zinc-300 mb-2">No Items for Sale</h3>
-                        <p className="text-zinc-500 text-sm">Check back later for unclaimed items available for purchase.</p>
+                        <h3 className="text-lg font-semibold text-primary mb-2">No Items for Sale</h3>
+                        <p className="text-text-muted text-sm">Check back later for unclaimed items available for purchase.</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -80,7 +80,7 @@ const Shop: React.FC = () => {
                                 style={{ animationDelay: `${idx * 50}ms` }}
                             >
                                 {/* Image */}
-                                <div className="relative h-48 bg-surface-200 flex items-center justify-center">
+                                <div className="relative h-48 bg-surface-50 flex items-center justify-center">
                                     {item.imageUrl ? (
                                         <img
                                             src={item.imageUrl.startsWith('http') ? item.imageUrl : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${item.imageUrl}`}
@@ -88,12 +88,11 @@ const Shop: React.FC = () => {
                                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                         />
                                     ) : (
-                                        <Package className="w-10 h-10 text-zinc-700" />
+                                        <Package className="w-10 h-10 text-text-muted" />
                                     )}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent opacity-60" />
 
                                     {/* Price badge */}
-                                    <div className="absolute top-3 right-3 flex items-center gap-1 text-sm font-bold text-amber-300 bg-amber-500/15 border border-amber-500/20 px-2.5 py-1 rounded-lg backdrop-blur-md">
+                                    <div className="absolute top-3 right-3 flex items-center gap-1 text-sm font-bold text-text-primary bg-surface-50 px-2.5 py-1 rounded-full shadow-sm">
                                         <IndianRupee className="w-3.5 h-3.5" />
                                         <span>{(item as any).price}</span>
                                     </div>
@@ -101,10 +100,10 @@ const Shop: React.FC = () => {
 
                                 {/* Content */}
                                 <div className="p-5 space-y-3">
-                                    <h3 className="text-base font-semibold text-white">{item.title}</h3>
-                                    <p className="text-zinc-500 text-sm line-clamp-2 leading-relaxed">{item.description}</p>
+                                    <h3 className="text-base font-semibold text-primary">{item.title}</h3>
+                                    <p className="text-text-secondary text-sm line-clamp-2 leading-relaxed">{item.description}</p>
 
-                                    <div className="flex flex-wrap items-center gap-3 text-[11px] text-zinc-600">
+                                    <div className="flex flex-wrap items-center gap-3 text-[11px] text-text-muted">
                                         {(item as any).location && (
                                             <div className="flex items-center gap-1">
                                                 <MapPin className="w-3 h-3" />

@@ -111,36 +111,36 @@ const Home: React.FC = () => {
                 {/* ═══ Stats Bar ═══ */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="stat-card flex items-center gap-4">
-                        <div className="w-11 h-11 rounded-xl bg-indigo-500/10 flex items-center justify-center">
-                            <Package className="w-5 h-5 text-indigo-400" />
+                        <div className="w-11 h-11 rounded-full bg-surface-50 flex items-center justify-center">
+                            <Package className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                            <p className="text-2xl font-bold text-white">{items.length}</p>
-                            <p className="text-xs text-zinc-500 font-medium">Total Items</p>
+                            <p className="text-2xl font-semibold text-primary">{items.length}</p>
+                            <p className="text-xs text-text-secondary font-medium">Total Items</p>
                         </div>
                     </div>
                     <div className="stat-card flex items-center gap-4">
-                        <div className="w-11 h-11 rounded-xl bg-red-500/10 flex items-center justify-center">
-                            <TrendingUp className="w-5 h-5 text-red-400" />
+                        <div className="w-11 h-11 rounded-full bg-surface-50 flex items-center justify-center">
+                            <TrendingUp className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                            <p className="text-2xl font-bold text-red-300">{lostCount}</p>
-                            <p className="text-xs text-zinc-500 font-medium">Lost Items</p>
+                            <p className="text-2xl font-semibold text-primary">{lostCount}</p>
+                            <p className="text-xs text-text-secondary font-medium">Lost Items</p>
                         </div>
                     </div>
                     <div className="stat-card flex items-center gap-4">
-                        <div className="w-11 h-11 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                            <Eye className="w-5 h-5 text-emerald-400" />
+                        <div className="w-11 h-11 rounded-full bg-surface-50 flex items-center justify-center">
+                            <Eye className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                            <p className="text-2xl font-bold text-emerald-300">{foundCount}</p>
-                            <p className="text-xs text-zinc-500 font-medium">Found Items</p>
+                            <p className="text-2xl font-semibold text-primary">{foundCount}</p>
+                            <p className="text-xs text-text-secondary font-medium">Found Items</p>
                         </div>
                     </div>
                 </div>
 
                 {/* ═══ Search & Filters ═══ */}
-                <div className="card p-5 space-y-4" style={{ transform: 'none' }}>
+                <div className="card p-4 space-y-4" style={{ transform: 'none' }}>
                     <div className="flex flex-col sm:flex-row gap-3">
                         <div className="relative flex-1">
                             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-600 w-4 h-4" />
@@ -167,8 +167,8 @@ const Home: React.FC = () => {
                                 key={type}
                                 onClick={() => setFilter(type)}
                                 className={`px-4 py-2 rounded-xl text-sm font-medium capitalize transition-all ${filter === type
-                                    ? 'bg-gradient-accent text-white shadow-glow-sm'
-                                    : 'bg-surface-100 text-zinc-400 hover:text-zinc-200 hover:bg-surface-200 border border-white/[0.04]'
+                                    ? 'bg-primary text-primary-text shadow-btn'
+                                    : 'bg-surface-50 text-text-secondary hover:text-primary hover:bg-surface-100 border border-surface-100'
                                     }`}
                             >
                                 {type === 'all' ? `All (${items.length})` : type === 'lost' ? `Lost (${lostCount})` : `Found (${foundCount})`}
@@ -179,7 +179,7 @@ const Home: React.FC = () => {
 
                 {/* ═══ Error ═══ */}
                 {error && (
-                    <div className="flex items-center gap-3 bg-red-500/10 border border-red-500/20 text-red-300 px-4 py-3 rounded-xl text-sm animate-scale-in">
+                    <div className="flex items-center gap-3 bg-[#FFF5F5] border border-[#FED7D7] text-[#E53E3E] px-4 py-3 rounded-xl text-sm animate-scale-in">
                         <AlertCircle className="w-4 h-4 flex-shrink-0" />
                         <span>{error}</span>
                     </div>
@@ -194,11 +194,11 @@ const Home: React.FC = () => {
                     </div>
                 ) : filteredItems.length === 0 ? (
                     <div className="card p-16 text-center" style={{ transform: 'none' }}>
-                        <div className="w-16 h-16 rounded-2xl bg-surface-200 flex items-center justify-center mx-auto mb-4">
-                            <Package className="w-8 h-8 text-zinc-600" />
+                        <div className="w-16 h-16 rounded-2xl bg-surface-50 border border-surface-100 flex items-center justify-center mx-auto mb-4">
+                            <Package className="w-8 h-8 text-text-muted" />
                         </div>
-                        <h3 className="text-lg font-semibold text-zinc-300 mb-2">No items found</h3>
-                        <p className="text-zinc-500 text-sm mb-6">Try adjusting your search or filters</p>
+                        <h3 className="text-lg font-semibold text-primary mb-2">No items found</h3>
+                        <p className="text-text-secondary text-sm mb-6">Try adjusting your search or filters</p>
                         <button
                             onClick={() => { setSearchTerm(''); setFilter('all'); }}
                             className="btn-secondary text-sm"
@@ -222,7 +222,7 @@ const Home: React.FC = () => {
                                             alt={item.title}
                                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                         />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent opacity-60" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent opacity-30" />
                                         <div className="absolute top-3 right-3">
                                             <span className={`badge ${item.type === 'lost' ? 'badge-lost' : 'badge-found'}`}>
                                                 {item.type}
@@ -230,8 +230,8 @@ const Home: React.FC = () => {
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="relative h-32 bg-surface-200 flex items-center justify-center">
-                                        <Package className="w-10 h-10 text-zinc-700" />
+                                    <div className="relative h-32 bg-surface-50 flex items-center justify-center border-b border-surface-100">
+                                        <Package className="w-10 h-10 text-text-muted" />
                                         <div className="absolute top-3 right-3">
                                             <span className={`badge ${item.type === 'lost' ? 'badge-lost' : 'badge-found'}`}>
                                                 {item.type}
@@ -242,15 +242,15 @@ const Home: React.FC = () => {
 
                                 {/* Content */}
                                 <div className="p-5 space-y-3">
-                                    <h3 className="text-base font-semibold text-white group-hover:text-accent-light transition-colors">
+                                    <h3 className="text-base font-semibold text-primary transition-colors">
                                         {item.title}
                                     </h3>
 
-                                    <p className="text-zinc-500 text-sm line-clamp-2 leading-relaxed">
+                                    <p className="text-text-secondary text-sm line-clamp-2 leading-relaxed">
                                         {item.description}
                                     </p>
 
-                                    <div className="flex items-center gap-4 text-xs text-zinc-600">
+                                    <div className="flex items-center gap-4 text-xs text-text-muted">
                                         <div className="flex items-center gap-1.5">
                                             <MapPin className="w-3.5 h-3.5" />
                                             <span>{item.location}</span>
@@ -282,7 +282,7 @@ const Home: React.FC = () => {
                                             <button
                                                 onClick={() => handlePutOnSale(item.id)}
                                                 disabled={actionLoading === item.id}
-                                                className="w-full btn flex items-center justify-center gap-2 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 py-2.5 text-sm"
+                                                className="w-full btn flex items-center justify-center gap-2 bg-surface-50 text-text-secondary hover:text-primary hover:bg-surface-100 border border-surface-100 py-2.5 text-sm rounded-lg transition-colors"
                                             >
                                                 {actionLoading === item.id ? (
                                                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -293,7 +293,7 @@ const Home: React.FC = () => {
                                             </button>
                                         )}
                                         {item.status === 'returned' && (
-                                            <div className="text-center text-xs text-zinc-600 py-2 bg-surface-50 rounded-xl border border-white/[0.04]">
+                                            <div className="text-center text-xs text-text-secondary py-2 bg-surface-50 rounded-xl border border-surface-100">
                                                 ✓ Already Returned
                                             </div>
                                         )}
@@ -306,20 +306,20 @@ const Home: React.FC = () => {
 
                 {/* ═══ Claim Modal — Select Lost Item ═══ */}
                 {claimModalOpen && (
-                    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                         <div className="w-full max-w-lg card p-6 animate-scale-in space-y-5" style={{ transform: 'none' }}>
                             {/* Header */}
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h2 className="text-lg font-bold text-white">Select Your Lost Item</h2>
-                                    <p className="text-xs text-zinc-500 mt-1">
+                                    <h2 className="text-lg font-bold text-primary">Select Your Lost Item</h2>
+                                    <p className="text-xs text-text-secondary mt-1">
                                         Choose which lost item you're claiming matches
-                                        {claimFoundItem && <span className="text-accent-light"> "{claimFoundItem.title}"</span>}
+                                        {claimFoundItem && <span className="font-semibold text-primary"> "{claimFoundItem.title}"</span>}
                                     </p>
                                 </div>
                                 <button
                                     onClick={() => setClaimModalOpen(false)}
-                                    className="p-2 rounded-xl text-zinc-500 hover:text-white hover:bg-surface-200 transition-colors"
+                                    className="p-2 rounded-xl text-text-muted hover:text-primary hover:bg-surface-50 transition-colors"
                                 >
                                     <X className="w-5 h-5" />
                                 </button>
@@ -328,15 +328,15 @@ const Home: React.FC = () => {
                             {/* Lost Items List */}
                             <div className="max-h-[340px] overflow-y-auto space-y-2 pr-1">
                                 {myLostLoading ? (
-                                    <div className="flex items-center justify-center py-8 gap-3 text-zinc-500">
+                                    <div className="flex items-center justify-center py-8 gap-3 text-text-muted">
                                         <Loader2 className="w-5 h-5 animate-spin" />
                                         <span className="text-sm">Loading your lost items...</span>
                                     </div>
                                 ) : myLostItems.length === 0 ? (
                                     <div className="text-center py-8">
-                                        <Package className="w-10 h-10 text-zinc-700 mx-auto mb-3" />
-                                        <p className="text-zinc-400 text-sm font-medium">No lost items found</p>
-                                        <p className="text-zinc-600 text-xs mt-1">You need to report a lost item first</p>
+                                        <Package className="w-10 h-10 text-text-muted mx-auto mb-3" />
+                                        <p className="text-text-secondary text-sm font-medium">No lost items found</p>
+                                        <p className="text-text-muted text-xs mt-1">You need to report a lost item first</p>
                                         <button
                                             onClick={() => { setClaimModalOpen(false); navigate('/report'); }}
                                             className="btn-primary text-xs mt-4"
@@ -350,12 +350,12 @@ const Home: React.FC = () => {
                                             key={lostItem.id}
                                             onClick={() => setSelectedLostItemId(lostItem.id)}
                                             className={`w-full flex items-center gap-3 p-3 rounded-xl border text-left transition-all ${selectedLostItemId === lostItem.id
-                                                ? 'border-accent/40 bg-accent/10 ring-1 ring-accent/20'
-                                                : 'border-white/[0.06] bg-surface-100 hover:bg-surface-200 hover:border-white/[0.1]'
+                                                ? 'border-primary bg-surface-50 ring-1 ring-primary'
+                                                : 'border-surface-100 bg-white hover:bg-surface-50'
                                                 }`}
                                         >
                                             {/* Thumbnail */}
-                                            <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-surface-200 flex items-center justify-center">
+                                            <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-surface-50 border border-surface-100 flex items-center justify-center">
                                                 {lostItem.imageUrl ? (
                                                     <img
                                                         src={lostItem.imageUrl.startsWith('http') ? lostItem.imageUrl : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${lostItem.imageUrl}`}
@@ -363,18 +363,18 @@ const Home: React.FC = () => {
                                                         className="w-full h-full object-cover"
                                                     />
                                                 ) : (
-                                                    <Package className="w-5 h-5 text-zinc-600" />
+                                                    <Package className="w-5 h-5 text-text-muted" />
                                                 )}
                                             </div>
                                             {/* Info */}
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-medium text-white truncate">{lostItem.title}</p>
-                                                <p className="text-xs text-zinc-500 truncate">{lostItem.description}</p>
-                                                <p className="text-[11px] text-zinc-600 mt-0.5">{lostItem.location}</p>
+                                                <p className="text-sm font-medium text-primary truncate">{lostItem.title}</p>
+                                                <p className="text-xs text-text-secondary truncate">{lostItem.description}</p>
+                                                <p className="text-[11px] text-text-muted mt-0.5">{lostItem.location}</p>
                                             </div>
                                             {/* Selected indicator */}
                                             {selectedLostItemId === lostItem.id && (
-                                                <div className="w-5 h-5 rounded-full bg-accent flex items-center justify-center flex-shrink-0">
+                                                <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
                                                     <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                                                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                                                     </svg>
@@ -387,7 +387,7 @@ const Home: React.FC = () => {
 
                             {/* Actions */}
                             {myLostItems.length > 0 && (
-                                <div className="flex gap-3 pt-2 border-t border-white/[0.04]">
+                                <div className="flex gap-3 pt-2 border-t border-surface-100">
                                     <button
                                         onClick={() => setClaimModalOpen(false)}
                                         className="flex-1 btn-secondary py-2.5 text-sm"

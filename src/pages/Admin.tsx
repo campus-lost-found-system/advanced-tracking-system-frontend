@@ -6,9 +6,9 @@ import {
     seedCctvLogs, approveSale, getReturnedItems, getForSaleItems, markItemSold, Claim, Item
 } from '../api/services';
 import {
-    Check, X, Calendar, MessageCircle, Sparkles,
-    Database, Loader2, RotateCcw, StickyNote, FileSearch,
-    ShieldAlert, BarChart3, DollarSign, TrendingUp, Clock, Package
+    Check, X, Calendar, MessageCircle, Database, Loader2, RotateCcw, 
+    StickyNote, FileSearch, ShieldAlert, BarChart3, DollarSign, 
+    TrendingUp, Clock, Package, Eye
 } from 'lucide-react';
 import Layout from '../components/Layout';
 
@@ -230,10 +230,10 @@ const Admin: React.FC = () => {
     };
 
     const analyticsCards = [
-        { label: 'Total Claims', key: 'total', icon: BarChart3, color: 'bg-indigo-500/10 text-indigo-400', valueClass: 'text-white' },
-        { label: 'Pending', key: 'pending', icon: Clock, color: 'bg-amber-500/10 text-amber-400', valueClass: 'text-amber-300' },
-        { label: 'Approved', key: 'approved', icon: Check, color: 'bg-emerald-500/10 text-emerald-400', valueClass: 'text-emerald-300' },
-        { label: 'Rejected', key: 'rejected', icon: X, color: 'bg-red-500/10 text-red-400', valueClass: 'text-red-300' },
+        { label: 'Total Claims', key: 'total', icon: BarChart3, color: 'bg-surface-50 text-primary', valueClass: 'text-primary' },
+        { label: 'Pending', key: 'pending', icon: Clock, color: 'bg-surface-50 text-text-secondary', valueClass: 'text-primary' },
+        { label: 'Approved', key: 'approved', icon: Check, color: 'bg-surface-50 text-green-600', valueClass: 'text-primary' },
+        { label: 'Rejected', key: 'rejected', icon: X, color: 'bg-surface-50 text-red-600', valueClass: 'text-primary' },
     ];
 
     return (
@@ -249,15 +249,15 @@ const Admin: React.FC = () => {
                         {seedLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Database className="w-3.5 h-3.5" />}
                         <span>{seedLoading ? 'Seeding...' : 'Seed CCTV'}</span>
                     </button>
-                    <div className="ml-auto badge bg-surface-200 text-zinc-300 border border-white/[0.06]">
+                    <div className="ml-auto badge">
                         {claims.length} Pending
                     </div>
                 </div>
 
                 {seedMsg && (
                     <div className={`text-sm rounded-xl px-4 py-3 border animate-scale-in ${seedMsg.startsWith('Error')
-                        ? 'bg-red-500/10 border-red-500/20 text-red-300'
-                        : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300'
+                        ? 'bg-red-50 text-red-600 border-red-100'
+                        : 'bg-surface-50 text-primary border-surface-200'
                         }`}>
                         {seedMsg}
                     </div>
@@ -271,7 +271,7 @@ const Admin: React.FC = () => {
                         analyticsCards.map((card) => (
                             <div key={card.key} className="stat-card">
                                 <div className="flex items-center gap-3 mb-3">
-                                    <div className={`w-9 h-9 rounded-xl ${card.color} flex items-center justify-center`}>
+                                    <div className={`w-9 h-9 rounded-full ${card.color} flex items-center justify-center`}>
                                         <card.icon className="w-[18px] h-[18px]" />
                                     </div>
                                     <span className="text-[11px] text-zinc-500 font-semibold uppercase tracking-wider">{card.label}</span>
@@ -289,17 +289,17 @@ const Admin: React.FC = () => {
                     <div className="card p-6 animate-scale-in" style={{ transform: 'none' }}>
                         <div className="flex justify-between items-center mb-4">
                             <div className="flex items-center gap-3">
-                                <div className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                                    <FileSearch className="w-[18px] h-[18px] text-emerald-400" />
+                                <div className="w-9 h-9 rounded-xl bg-surface-50 border border-surface-100 flex items-center justify-center">
+                                    <FileSearch className="w-[18px] h-[18px] text-primary" />
                                 </div>
                                 <div>
-                                    <h3 className="text-sm font-semibold text-white">Evidence</h3>
-                                    <p className="text-[11px] text-zinc-500">Claim {evidenceClaimId.slice(0, 8)}...</p>
+                                    <h3 className="text-sm font-semibold text-primary">Evidence</h3>
+                                    <p className="text-[11px] text-text-muted">Claim {evidenceClaimId.slice(0, 8)}...</p>
                                 </div>
                             </div>
                             <button
                                 onClick={() => { setEvidenceClaimId(null); setEvidenceData(null); }}
-                                className="p-2 rounded-xl text-zinc-500 hover:text-white hover:bg-surface-200 transition-colors"
+                                className="p-2 rounded-xl text-text-muted hover:text-primary hover:bg-surface-50 transition-colors"
                             >
                                 <X className="w-4 h-4" />
                             </button>
@@ -310,7 +310,7 @@ const Admin: React.FC = () => {
                                 <span>Loading evidence...</span>
                             </div>
                         ) : evidenceData ? (
-                            <pre className="bg-surface rounded-xl border border-white/[0.04] p-4 text-xs text-zinc-400 overflow-x-auto whitespace-pre-wrap max-h-[300px] overflow-y-auto">
+                            <pre className="bg-surface-50 rounded-xl border border-surface-100 p-4 text-xs text-text-secondary overflow-x-auto whitespace-pre-wrap max-h-[300px] overflow-y-auto">
                                 {JSON.stringify(evidenceData, null, 2)}
                             </pre>
                         ) : (
@@ -320,27 +320,27 @@ const Admin: React.FC = () => {
                 )}
 
                 {/* ═══ Tabs ═══ */}
-                <div className="flex gap-4 border-b border-white/[0.06] mb-6">
+                <div className="flex gap-4 border-b border-surface-100 mb-6">
                     <button
                         onClick={() => setActiveTab('claims')}
-                        className={`pb-3 text-sm font-medium transition-colors relative ${activeTab === 'claims' ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
+                        className={`pb-3 text-sm font-medium transition-colors relative ${activeTab === 'claims' ? 'text-primary' : 'text-text-secondary hover:text-primary'}`}
                     >
                         Pending Claims
-                        {activeTab === 'claims' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent rounded-t-full" />}
+                        {activeTab === 'claims' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full" />}
                     </button>
                     <button
                         onClick={() => setActiveTab('returned')}
-                        className={`pb-3 text-sm font-medium transition-colors relative ${activeTab === 'returned' ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
+                        className={`pb-3 text-sm font-medium transition-colors relative ${activeTab === 'returned' ? 'text-primary' : 'text-text-secondary hover:text-primary'}`}
                     >
                         Returned Items ({returnedItems.length})
-                        {activeTab === 'returned' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent rounded-t-full" />}
+                        {activeTab === 'returned' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full" />}
                     </button>
                     <button
                         onClick={() => setActiveTab('sale')}
-                        className={`pb-3 text-sm font-medium transition-colors relative ${activeTab === 'sale' ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
+                        className={`pb-3 text-sm font-medium transition-colors relative ${activeTab === 'sale' ? 'text-primary' : 'text-text-secondary hover:text-primary'}`}
                     >
                         For Sale ({forSaleItems.length})
-                        {activeTab === 'sale' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent rounded-t-full" />}
+                        {activeTab === 'sale' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full" />}
                     </button>
                 </div>
 
@@ -352,11 +352,11 @@ const Admin: React.FC = () => {
                         </div>
                     ) : claims.length === 0 ? (
                         <div className="card p-16 text-center" style={{ transform: 'none' }}>
-                            <div className="w-16 h-16 rounded-2xl bg-surface-200 flex items-center justify-center mx-auto mb-4">
-                                <TrendingUp className="w-8 h-8 text-zinc-600" />
+                            <div className="w-16 h-16 rounded-2xl bg-surface-50 border border-surface-100 flex items-center justify-center mx-auto mb-4">
+                                <TrendingUp className="w-8 h-8 text-text-muted" />
                             </div>
-                            <h3 className="text-lg font-semibold text-zinc-300 mb-2">All Clear!</h3>
-                            <p className="text-zinc-500 text-sm">No pending claims to review</p>
+                            <h3 className="text-lg font-semibold text-primary mb-2">All Clear!</h3>
+                            <p className="text-text-secondary text-sm">No pending claims to review</p>
                         </div>
                     ) : (
                         <div className="space-y-4">
@@ -372,9 +372,9 @@ const Admin: React.FC = () => {
                                             <div className="flex gap-3 mb-3">
                                                 {/* Found item thumbnail */}
                                                 <div className="flex-1 min-w-0">
-                                                    <p className="text-[10px] text-emerald-400 uppercase tracking-widest mb-1.5 font-semibold">Found Item</p>
+                                                    <p className="text-[10px] text-text-muted uppercase tracking-widest mb-1.5 font-semibold">Found Item</p>
                                                     <div className="flex items-center gap-2">
-                                                        <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-surface-200 border border-white/[0.04] flex items-center justify-center">
+                                                        <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-surface-50 border border-surface-100 flex items-center justify-center">
                                                             {claim.item?.imageUrl ? (
                                                                 <img
                                                                     src={claim.item.imageUrl.startsWith('http') ? claim.item.imageUrl : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${claim.item.imageUrl}`}
@@ -382,22 +382,22 @@ const Admin: React.FC = () => {
                                                                     className="w-full h-full object-cover"
                                                                 />
                                                             ) : (
-                                                                <Package className="w-5 h-5 text-zinc-600" />
+                                                                <Package className="w-5 h-5 text-text-muted" />
                                                             )}
                                                         </div>
                                                         <div className="min-w-0">
-                                                            <p className="text-sm font-medium text-white truncate">{claim.item?.title || 'Item'}</p>
-                                                            <p className="text-[11px] text-zinc-600 truncate">{(claim.item as any)?.location || ''}</p>
+                                                            <p className="text-sm font-medium text-primary truncate">{claim.item?.title || 'Item'}</p>
+                                                            <p className="text-[11px] text-text-secondary truncate">{(claim.item as any)?.location || ''}</p>
                                                         </div>
                                                     </div>
                                                 </div>
 
                                                 {/* Lost item thumbnail */}
                                                 <div className="flex-1 min-w-0">
-                                                    <p className="text-[10px] text-red-400 uppercase tracking-widest mb-1.5 font-semibold">Lost Item</p>
+                                                    <p className="text-[10px] text-text-muted uppercase tracking-widest mb-1.5 font-semibold">Lost Item</p>
                                                     {(claim as any).lostItem ? (
                                                         <div className="flex items-center gap-2">
-                                                            <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-surface-200 border border-white/[0.04] flex items-center justify-center">
+                                                            <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-surface-50 border border-surface-100 flex items-center justify-center">
                                                                 {(claim as any).lostItem?.imageUrl ? (
                                                                     <img
                                                                         src={(claim as any).lostItem.imageUrl.startsWith('http') ? (claim as any).lostItem.imageUrl : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${(claim as any).lostItem.imageUrl}`}
@@ -405,26 +405,26 @@ const Admin: React.FC = () => {
                                                                         className="w-full h-full object-cover"
                                                                     />
                                                                 ) : (
-                                                                    <Package className="w-5 h-5 text-zinc-600" />
+                                                                    <Package className="w-5 h-5 text-text-muted" />
                                                                 )}
                                                             </div>
                                                             <div className="min-w-0">
-                                                                <p className="text-sm font-medium text-white truncate">{(claim as any).lostItem?.title || 'Item'}</p>
-                                                                <p className="text-[11px] text-zinc-600 truncate">{(claim as any).lostItem?.location || ''}</p>
+                                                                <p className="text-sm font-medium text-primary truncate">{(claim as any).lostItem?.title || 'Item'}</p>
+                                                                <p className="text-[11px] text-text-secondary truncate">{(claim as any).lostItem?.location || ''}</p>
                                                             </div>
                                                         </div>
                                                     ) : (
-                                                        <p className="text-xs text-zinc-600 italic">No linked lost item</p>
+                                                        <p className="text-xs text-text-muted italic">No linked lost item</p>
                                                     )}
                                                 </div>
                                             </div>
 
                                             {claim.item?.description && (
-                                                <p className="text-sm text-zinc-500 line-clamp-2 leading-relaxed mb-3">
+                                                <p className="text-sm text-text-secondary line-clamp-2 leading-relaxed mb-3">
                                                     {claim.item.description}
                                                 </p>
                                             )}
-                                            <div className="flex items-center gap-1.5 text-xs text-zinc-600">
+                                            <div className="flex items-center gap-1.5 text-xs text-text-secondary">
                                                 <Calendar className="w-3.5 h-3.5" />
                                                 <span>{
                                                     claim.createdAt
@@ -466,35 +466,35 @@ const Admin: React.FC = () => {
                                         {claim.itemId && (
                                             <button
                                                 onClick={() => navigate(`/admin/verify/${claim.id}`)}
-                                                className="btn-secondary text-xs flex items-center gap-2 py-2 !border-violet-500/20 !text-violet-300 hover:!bg-violet-500/10"
+                                                className="btn-secondary text-xs flex items-center gap-2 py-2"
                                             >
-                                                <Sparkles className="w-3.5 h-3.5" />
+                                                <Eye className="w-3.5 h-3.5" />
                                                 <span>Verify Claim</span>
                                             </button>
                                         )}
                                     </div>
 
                                     {/* Secondary Actions */}
-                                    <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-white/[0.03]">
+                                    <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-surface-100">
                                         <button onClick={() => handleReopen(claim.id)} disabled={actionLoading === claim.id}
-                                            className="text-[11px] text-zinc-500 hover:text-zinc-200 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-surface-200 transition-all disabled:opacity-50">
+                                            className="text-[11px] text-text-secondary hover:text-primary flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-surface-50 transition-all disabled:opacity-50">
                                             <RotateCcw className="w-3 h-3" /><span>Reopen</span>
                                         </button>
                                         <button onClick={() => handleAddNote(claim.id)} disabled={actionLoading === claim.id}
-                                            className="text-[11px] text-zinc-500 hover:text-zinc-200 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-surface-200 transition-all disabled:opacity-50">
+                                            className="text-[11px] text-text-secondary hover:text-primary flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-surface-50 transition-all disabled:opacity-50">
                                             <StickyNote className="w-3 h-3" /><span>Note</span>
                                         </button>
                                         <button onClick={() => handleViewEvidence(claim.id)} disabled={actionLoading === claim.id}
-                                            className="text-[11px] text-zinc-500 hover:text-zinc-200 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-surface-200 transition-all disabled:opacity-50">
+                                            className="text-[11px] text-text-secondary hover:text-primary flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-surface-50 transition-all disabled:opacity-50">
                                             <FileSearch className="w-3 h-3" /><span>Evidence</span>
                                         </button>
                                         <button onClick={() => handleRequestProof(claim.id)} disabled={actionLoading === claim.id}
-                                            className="text-[11px] text-zinc-500 hover:text-zinc-200 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-surface-200 transition-all disabled:opacity-50">
+                                            className="text-[11px] text-text-secondary hover:text-primary flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-surface-50 transition-all disabled:opacity-50">
                                             <ShieldAlert className="w-3 h-3" /><span>Proof</span>
                                         </button>
                                         {claim.itemId && (
                                             <button onClick={() => handleApproveSale(claim.id, claim.itemId)} disabled={actionLoading === claim.id}
-                                                className="text-[11px] text-amber-500/80 hover:text-amber-300 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-amber-500/10 transition-all disabled:opacity-50">
+                                                className="text-[11px] text-text-secondary hover:text-primary flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-surface-50 transition-all disabled:opacity-50">
                                                 <DollarSign className="w-3 h-3" /><span>Sale</span>
                                             </button>
                                         )}
@@ -515,7 +515,7 @@ const Admin: React.FC = () => {
                                 <div className="w-16 h-16 rounded-2xl bg-surface-200 flex items-center justify-center mx-auto mb-4">
                                     <Package className="w-8 h-8 text-zinc-600" />
                                 </div>
-                                <h3 className="text-lg font-semibold text-zinc-300 mb-2">No Returned Items</h3>
+                                <h3 className="text-lg font-semibold text-primary mb-2">No Returned Items</h3>
                                 <p className="text-zinc-500 text-sm">Items that have been successfully returned will appear here.</p>
                             </div>
                         ) : (
@@ -526,7 +526,7 @@ const Admin: React.FC = () => {
                                     style={{ animationDelay: `${idx * 50}ms` }}
                                 >
                                     {/* Image */}
-                                    <div className="relative h-48 bg-surface-200 flex items-center justify-center">
+                                    <div className="relative h-48 bg-surface-50 flex items-center justify-center">
                                         {item.imageUrl ? (
                                             <img
                                                 src={item.imageUrl.startsWith('http') ? item.imageUrl : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${item.imageUrl}`}
@@ -537,14 +537,14 @@ const Admin: React.FC = () => {
                                             <Package className="w-10 h-10 text-zinc-700" />
                                         )}
                                         <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent opacity-60" />
-                                        <div className="absolute top-3 right-3 text-[10px] font-bold tracking-widest text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded-md uppercase backdrop-blur-md">
+                                        <div className="absolute top-3 right-3 text-[10px] font-bold tracking-widest text-primary bg-surface-50 border border-surface-200 px-2 py-1 rounded-md uppercase backdrop-blur-md">
                                             Returned
                                         </div>
                                     </div>
 
                                     {/* Content */}
                                     <div className="p-5 space-y-3">
-                                        <h3 className="text-base font-semibold text-white">{item.title}</h3>
+                                        <h3 className="text-base font-semibold text-primary">{item.title}</h3>
                                         <p className="text-zinc-500 text-sm line-clamp-2 leading-relaxed">{item.description}</p>
                                         <div className="flex flex-wrap items-center gap-4 text-[11px] text-zinc-600">
                                             <div className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /><span>{
@@ -554,7 +554,7 @@ const Admin: React.FC = () => {
                                                         : new Date(item.createdAt as string).toLocaleDateString()
                                                     : 'N/A'
                                             }</span></div>
-                                            <div className="flex items-center gap-1.5 capitalize px-2 py-0.5 rounded-full bg-surface-200 border border-white/[0.04]">
+                                            <div className="flex items-center gap-1.5 capitalize px-2 py-0.5 rounded-full bg-surface-50 border border-surface-100">
                                                 {item.type} Item
                                             </div>
                                         </div>
@@ -571,10 +571,10 @@ const Admin: React.FC = () => {
                             [...Array(3)].map((_, i) => <div key={i} className="skeleton h-48" />)
                         ) : forSaleItems.length === 0 ? (
                             <div className="col-span-full card p-16 text-center" style={{ transform: 'none' }}>
-                                <div className="w-16 h-16 rounded-2xl bg-surface-200 flex items-center justify-center mx-auto mb-4">
+                                <div className="w-16 h-16 rounded-2xl bg-surface-50 flex items-center justify-center mx-auto mb-4">
                                     <DollarSign className="w-8 h-8 text-zinc-600" />
                                 </div>
-                                <h3 className="text-lg font-semibold text-zinc-300 mb-2">No Items for Sale</h3>
+                                <h3 className="text-lg font-semibold text-primary mb-2">No Items for Sale</h3>
                                 <p className="text-zinc-500 text-sm">Approve returned/unclaimed items for sale to see them here.</p>
                             </div>
                         ) : (
@@ -585,7 +585,7 @@ const Admin: React.FC = () => {
                                     style={{ animationDelay: `${idx * 50}ms` }}
                                 >
                                     <div className="flex items-start gap-4 mb-4">
-                                        <div className="w-16 h-16 rounded-xl overflow-hidden bg-surface-200 flex-shrink-0">
+                                        <div className="w-16 h-16 rounded-xl overflow-hidden bg-surface-50 flex-shrink-0">
                                             {item.imageUrl ? (
                                                 <img
                                                     src={item.imageUrl.startsWith('http') ? item.imageUrl : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${item.imageUrl}`}
@@ -600,8 +600,8 @@ const Admin: React.FC = () => {
                                         </div>
                                         <div className="min-w-0 flex-1">
                                             <div className="flex justify-between items-start gap-2">
-                                                <h4 className="font-medium text-white line-clamp-1">{item.title}</h4>
-                                                <span className="text-sm font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                                                <h4 className="font-medium text-primary line-clamp-1">{item.title}</h4>
+                                                <span className="text-sm font-bold text-primary bg-surface-50 px-2 py-0.5 rounded border border-surface-200">
                                                     ₹{item.price}
                                                 </span>
                                             </div>
@@ -621,7 +621,7 @@ const Admin: React.FC = () => {
                                     </div>
 
                                     {(item as any).saleStatus === 'reserved' && (
-                                        <div className="mb-4 bg-amber-500/10 border border-amber-500/20 rounded-lg p-3 text-xs text-amber-200/80">
+                                        <div className="mb-4 bg-surface-50 border border-surface-200 rounded-lg p-3 text-xs text-text-secondary">
                                             <span className="font-semibold block mb-1">Reserved via Shop</span>
                                             Buyer ID: {(item as any).reservedBy}
                                         </div>
@@ -631,7 +631,7 @@ const Admin: React.FC = () => {
                                         <button
                                             onClick={() => handleMarkSold(item.id)}
                                             disabled={actionLoading === item.id}
-                                            className="btn flex items-center gap-2 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 px-4 py-2 text-sm"
+                                            className="btn flex items-center gap-2 bg-surface-50 text-primary hover:bg-surface-100 border border-surface-200 px-4 py-2 text-sm"
                                         >
                                             {actionLoading === item.id ? (
                                                 <Loader2 className="w-4 h-4 animate-spin" />
