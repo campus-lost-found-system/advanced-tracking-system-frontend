@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createItem, uploadItemImage, extractFeatures, compareAndSuggest } from '../api/services';
-import { Loader2, MapPin, FileText, Tag, Upload } from 'lucide-react';
+import { Loader2, MapPin, FileText, Tag, Upload, Calendar, Clock } from 'lucide-react';
 import Layout from '../components/Layout';
 
 const ReportItem: React.FC = () => {
+    const CCTV_ZONES = ['Library', 'Cafeteria', 'Main Gate', 'Lab Block'];
+
     const [formData, setFormData] = useState({
         title: '',
         type: 'lost' as 'lost' | 'found',
         location: '',
         description: '',
+        date: '',
+        time: '',
     });
     const [image, setImage] = useState<string>('');
     const [loading, setLoading] = useState(false);
@@ -126,18 +130,65 @@ const ReportItem: React.FC = () => {
 
                             <div>
                                 <label htmlFor="location" className="flex items-center gap-2 text-sm font-medium text-text-muted mb-2">
-                                    <MapPin className="w-3.5 h-3.5" /> Location
+                                    <MapPin className="w-3.5 h-3.5" /> Location / Zone
                                 </label>
-                                <input
-                                    id="location"
-                                    type="text"
-                                    value={formData.location}
-                                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                                    required
-                                    className="input"
-                                    placeholder="e.g., Library 2nd Floor"
-                                />
+                                {formData.type === 'lost' ? (
+                                    <select
+                                        id="location"
+                                        value={formData.location}
+                                        onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                                        required
+                                        className="input"
+                                    >
+                                        <option value="">Select zone where item was lost</option>
+                                        {CCTV_ZONES.map((zone) => (
+                                            <option key={zone} value={zone}>{zone}</option>
+                                        ))}
+                                    </select>
+                                ) : (
+                                    <input
+                                        id="location"
+                                        type="text"
+                                        value={formData.location}
+                                        onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                                        required
+                                        className="input"
+                                        placeholder="e.g., Library 2nd Floor"
+                                    />
+                                )}
                             </div>
+
+                            {/* Date & Time — only for lost items */}
+                            {formData.type === 'lost' && (
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label htmlFor="date" className="flex items-center gap-2 text-sm font-medium text-text-muted mb-2">
+                                            <Calendar className="w-3.5 h-3.5" /> Date of Loss
+                                        </label>
+                                        <input
+                                            id="date"
+                                            type="date"
+                                            value={formData.date}
+                                            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                                            required
+                                            className="input"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="time" className="flex items-center gap-2 text-sm font-medium text-text-muted mb-2">
+                                            <Clock className="w-3.5 h-3.5" /> Approximate Time
+                                        </label>
+                                        <input
+                                            id="time"
+                                            type="time"
+                                            value={formData.time}
+                                            onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                                            required
+                                            className="input"
+                                        />
+                                    </div>
+                                </div>
+                            )}
 
                             <div>
                                 <label htmlFor="description" className="flex items-center gap-2 text-sm font-medium text-text-muted mb-2">
